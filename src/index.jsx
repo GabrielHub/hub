@@ -1,18 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { ErrorBoundary } from 'components/ErrorBoundary';
-import { Root } from 'routes/root';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { routerConfig } from 'routes';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
-const router = createBrowserRouter([
-  {
-    path: '/hub',
-    element: <Root />,
-    errorElement: <ErrorBoundary />
-  }
-]);
+const router = createBrowserRouter(routerConfig);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
