@@ -10,10 +10,10 @@ export function Navbar() {
         <Typography variant="h4" sx={{ mr: 2 }}>
           Hub
         </Typography>
-        <Box>
+        <Box sx={{ flexGrow: 1, display: 'flex' }}>
           {navConfig.map((route) => (
             <Link key={route.path} to={route.path}>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1, mr: 2 }}>
                 {route.title}
               </Typography>
             </Link>
