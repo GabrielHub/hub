@@ -7,11 +7,15 @@ export function Navbar() {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h4">Hub</Typography>
+        <Typography variant="h4" sx={{ mr: 2 }}>
+          Hub
+        </Typography>
         <Box>
           {navConfig.map((route) => (
             <Link key={route.path} to={route.path}>
-              {route.title}
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                {route.title}
+              </Typography>
             </Link>
           ))}
         </Box>
