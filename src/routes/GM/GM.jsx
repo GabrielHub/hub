@@ -1,11 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Grid, TextField, Typography } from '@mui/material';
-import { lookupGM } from 'rest';
+import React, { useState, useEffect } from 'react';
+import { Button, Grid, TextField, Typography, List, ListItem, ListItemText } from '@mui/material';
+import { lookupGM, fetchPopularity } from 'rest';
 
 export function GM() {
   const [username, setUsername] = useState('');
   const [selectedGMData, setSelectedGMData] = useState(null);
+  const [gmList, setGMList] = useState([]);
   const [errorLabel, setErrorLabel] = useState('');
+
+  const getPopularityList = async () => {
+    const { data, error } = await fetchPopularity();
+    if (!error) {
+      setGMList(data);
+    }
+    // TODO Better error handling here (snackbar on error)
+  };
 
   const handleLookupGM = async () => {
     setSelectedGMData(null);
@@ -15,8 +24,14 @@ export function GM() {
     } else {
       setErrorLabel('');
       setSelectedGMData(data);
+      // TODO Instead of refreshing this should just be a realtime firestore fetch with the query on the front end
+      getPopularityList();
     }
   };
+
+  useEffect(() => {
+    getPopularityList();
+  }, []);
 
   return (
     <Grid
@@ -57,7 +72,17 @@ export function GM() {
         </Grid>
       )}
       <Grid sx={{ paddingTop: 6 }} xs={12} item>
-        <Typography>List of GMs (sorted!)</Typography>
+        <Typography variant="h6">List of GMs (sorted!)</Typography>
+      </Grid>
+      <Grid xs={12} item>
+        <List sx={{ width: '100%', maxWidth: '360' }}>
+          {Boolean(gmList.length) &&
+            gmList.map((gm) => (
+              <ListItem key={gm}>
+                <ListItemText primary={gm} />
+              </ListItem>
+            ))}
+        </List>
       </Grid>
     </Grid>
   );

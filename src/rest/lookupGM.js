@@ -2,7 +2,7 @@ import axios from 'axios';
 import { BASE_URL } from './constants';
 
 /**
- * @description
+ * @description Looks up a gm, and increases their popularity
  * @param {string} username username of GM to search
  * @returns {*} Object { username, name, image, requests, reviews }
  */

@@ -12,7 +12,7 @@ const admin = require('firebase-admin');
 const getPopularity = async (req, res) => {
   const gmResponse = [];
   const gmRef = admin.firestore().collection('gms');
-  const snapshot = await gmRef.orderBy('username', 'desc').get();
+  const snapshot = await gmRef.orderBy('requests', 'desc').get();
   snapshot.forEach((doc) => {
     gmResponse.push(doc.data().username);
   });
