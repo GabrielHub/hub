@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { routerConfig } from 'routes';
 import './index.css';
+import 'react-multi-carousel/lib/styles.css';
 import reportWebVitals from './reportWebVitals';
 
 const router = createBrowserRouter(routerConfig);
