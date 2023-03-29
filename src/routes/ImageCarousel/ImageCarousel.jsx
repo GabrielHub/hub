@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import Carousel from 'react-multi-carousel';
-import { fetchSpells } from 'rest/fetchSpells';
+import { fetchSpells } from 'rest';
 import { SpellCard } from 'components/SpellCard';
 
 const responsive = {
@@ -37,7 +37,9 @@ export function ImageCarousel() {
       console.log('ERROR', error);
     } else {
       setErrorText(null);
-      setSpells((prevSpells) => prevSpells.concat(data.spells));
+      if (data?.spells.length) {
+        setSpells((prevSpells) => prevSpells.concat(data.spells));
+      }
     }
   }, []);
 
