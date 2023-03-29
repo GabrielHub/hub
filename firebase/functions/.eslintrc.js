@@ -10,6 +10,12 @@ module.exports = {
   extends: ['airbnb', 'eslint:recommended', 'plugin:prettier/recommended'],
   rules: {
     'no-restricted-globals': ['error', 'name', 'length'],
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto'
+      }
+    ],
     'prefer-arrow-callback': 'error'
   },
   overrides: [
