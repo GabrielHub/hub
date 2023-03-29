@@ -8,6 +8,10 @@ const navConfig = [
   {
     title: 'Carousel',
     path: '/hub/carousel'
+  },
+  {
+    title: 'GMs',
+    path: '/hub/gm'
   }
 ];
 

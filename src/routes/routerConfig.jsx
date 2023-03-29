@@ -1,6 +1,7 @@
 import { ErrorBoundary } from 'components/ErrorBoundary';
 import { Root } from './Root/root';
 import { ImageCarousel } from './ImageCarousel';
+import { GM } from './GM';
 
 export const routerConfig = [
   {
@@ -11,6 +12,10 @@ export const routerConfig = [
       {
         path: '/hub/carousel',
         element: <ImageCarousel />
+      },
+      {
+        path: '/hub/gm',
+        element: <GM />
       }
     ]
   }
