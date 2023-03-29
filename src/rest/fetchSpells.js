@@ -7,7 +7,7 @@ const baseURL = 'https://startplaying.games/api';
  * @param {number} page pagination number
  * @returns An array of spells, with images, name, school and level
  */
-export const fetchSpells = (page) => {
+export const fetchSpells = async (page) => {
   return axios
     .get(`${baseURL}/detect-magic/spells?page=${page}`)
     .then((res) => {
