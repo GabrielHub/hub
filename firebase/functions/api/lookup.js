@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
-const { FieldValue } = require('firebase-admin/firestore');
-const fetchGM = require('../rest/fetchGM.js');
+const { FieldValue } = require('firebase-admin');
+const fetchGM = require('../rest/fetchGM');
 
 // * TO TEST:
 // ? app.post('/lookup').form({ username: 'dm-nate' })
@@ -19,7 +19,7 @@ const storeGM = async (req, res) => {
 
   // * Lookup GM
   const { data, error } = await fetchGM(username);
-  const gm = data?.gms?.[0];
+  const gm = data.gms[0];
   if (error || !gm) {
     throw new Error('Could not query GM');
   }
@@ -34,7 +34,7 @@ const storeGM = async (req, res) => {
     // * Add document if it does not exist
     writtenObject = {
       username: gmUsername,
-      reviews: gmProfile?.gmStats?.numReviews,
+      reviews: gmProfile.gmStats.numReviews,
       requests: 0,
       image,
       name
@@ -44,11 +44,11 @@ const storeGM = async (req, res) => {
     // * Increment the request;
     const gmData = gmDocRef.data();
     writtenObject = {
-      username: gmData?.username,
-      reviews: gmData?.reviews,
-      requests: gmData?.requests + 1,
-      image: gmData?.image,
-      name: gmData?.name
+      username: gmData.username,
+      reviews: gmData.reviews,
+      requests: gmData.requests + 1,
+      image: gmData.image,
+      name: gmData.name
     };
     await gmRef.doc(id).update({ requests: FieldValue.increment(1) });
   }
