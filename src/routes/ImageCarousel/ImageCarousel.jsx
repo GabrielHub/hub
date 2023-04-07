@@ -58,7 +58,7 @@ export function ImageCarousel() {
     if (!spells.length) {
       getSpells();
     }
-  }, []);
+  }, [getSpells, spells]);
 
   return (
     <Box m={2} p={2}>
