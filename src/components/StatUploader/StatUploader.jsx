@@ -1,44 +1,18 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, IconButton, TextField } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-
-function StatCard(props) {
-  // * player is the key we use to edit data
-  const { player, data, onChange, removePlayer } = props;
-
-  // eslint-disable-next-line no-underscore-dangle
-  const _onChange = (e) => {
-    onChange(player, e.target.name, e.target.value);
-  };
-
-  return (
-    <Grid sx={{ padding: 2 }} xs={12} container item>
-      <Grid xs item>
-        <IconButton aria-label="delete" onClick={() => removePlayer(player)}>
-          <DeleteIcon color="error" size="small" />
-        </IconButton>
-      </Grid>
-      {Object.keys(data).map((dataKey) => (
-        <Grid key={dataKey} xs item>
-          <TextField
-            variant="outlined"
-            name={dataKey}
-            label={dataKey.toUpperCase()}
-            value={data[dataKey]}
-            onChange={_onChange}
-          />
-        </Grid>
-      ))}
-    </Grid>
-  );
-}
+import { Grid, Button, Typography } from '@mui/material';
+import { StatCard } from './StatCard';
+import { TeamCard } from './TeamCard';
 
 export function StatUploader(props) {
-  const { possiblePlayers } = props;
+  const { possiblePlayers, teamData } = props;
 
   // * Editable list of players, this will be the list that gets uploaded
   const [playerList, setPlayerList] = useState(possiblePlayers);
+
+  // * Editable list of team data
+  const [firstTeamData, setFirstTeamData] = useState(teamData[Object.keys(teamData)[0]]);
+  const [secondTeamData, setSecondTeamData] = useState(teamData[Object.keys(teamData)[0]]);
 
   const updatePlayerValue = (player, valueKey, value) => {
     setPlayerList({
@@ -50,6 +24,20 @@ export function StatUploader(props) {
     });
   };
 
+  const updateTeamData = (teamKey, valueKey, value) => {
+    if (teamKey === 1) {
+      setFirstTeamData({
+        ...firstTeamData,
+        [valueKey]: value
+      });
+    } else {
+      setSecondTeamData({
+        ...secondTeamData,
+        [valueKey]: value
+      });
+    }
+  };
+
   // * Note that player is not necessarily the name, it is the unique key we'll use to remove players here
   const removePlayer = (player) => {
     setPlayerList((current) => {
@@ -59,8 +47,30 @@ export function StatUploader(props) {
     });
   };
 
+  // * Calculate and parse full player values and upload
+
   return (
     <Grid xs={12} container item>
+      <Grid xs={12} item>
+        <Typography variant="h5" gutterBottom>
+          <b>TEAM STATS</b>
+        </Typography>
+      </Grid>
+      <TeamCard
+        teamData={teamData[Object.keys(teamData)[0]]}
+        teamKey={Object.keys(teamData)[0]}
+        onChange={updateTeamData}
+      />
+      <TeamCard
+        teamData={teamData[Object.keys(teamData)[1]]}
+        teamKey={Object.keys(teamData)[1]}
+        onChange={updateTeamData}
+      />
+      <Grid xs={12} item>
+        <Typography variant="h5" gutterBottom>
+          <b>PLAYER STATS</b>
+        </Typography>
+      </Grid>
       {Boolean(Object.keys(playerList).length) &&
         Object.keys(playerList).map((player) => (
           <StatCard
@@ -71,6 +81,11 @@ export function StatUploader(props) {
             removePlayer={removePlayer}
           />
         ))}
+      <Grid xs={12} item>
+        <Button color="primary" variant="contained">
+          UPLOAD STATS
+        </Button>
+      </Grid>
     </Grid>
   );
 }
@@ -78,32 +93,10 @@ export function StatUploader(props) {
 StatUploader.propTypes = {
   possiblePlayers: PropTypes.objectOf(
     PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number]))
+  ).isRequired,
+  teamData: PropTypes.objectOf(
+    PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number]))
   ).isRequired
-};
-
-StatCard.propTypes = {
-  player: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  removePlayer: PropTypes.func.isRequired,
-  data: PropTypes.shape({
-    name: PropTypes.string,
-    grade: PropTypes.string,
-    pos: PropTypes.number,
-    mp: PropTypes.number,
-    pts: PropTypes.string,
-    treb: PropTypes.string,
-    drb: PropTypes.string,
-    orb: PropTypes.number,
-    ast: PropTypes.string,
-    stl: PropTypes.string,
-    blk: PropTypes.string,
-    pf: PropTypes.string,
-    tov: PropTypes.string,
-    fgm: PropTypes.string,
-    fga: PropTypes.number,
-    threepm: PropTypes.string,
-    threepa: PropTypes.number
-  }).isRequired
 };
 
 export default {};

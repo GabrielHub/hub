@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Grid, Button, Typography } from '@mui/material';
 import Tesseract from 'tesseract.js';
-import { parsePossiblePlayerData, removeSpecialCharacters } from 'utils';
+import { parsePossiblePlayerData, parseTeamTotalData, removeSpecialCharacters } from 'utils';
 import { StatUploader } from 'components/StatUploader';
 
 export function UploadStats() {
   const [possiblePlayerStats, setPossiblePlayerStats] = useState({});
+  const [teamData, setTeamData] = useState(null);
   const [imageData, setImageData] = useState(null);
   const [confidence, setConfidence] = useState(null);
   const [progress, setProgress] = useState(0);
@@ -18,7 +19,12 @@ export function UploadStats() {
     }).then(({ data: { text, confidence: confidenceResult } }) => {
       setProgress(0);
       setConfidence(confidenceResult);
-      setPossiblePlayerStats(parsePossiblePlayerData(removeSpecialCharacters(text)));
+
+      const input = removeSpecialCharacters(text).split(' ');
+      // * Find the two teams stats (needed for advanced metrics)
+      setTeamData(parseTeamTotalData(input));
+      // * Find all possible players
+      setPossiblePlayerStats(parsePossiblePlayerData(input));
     });
   }, [imageData]);
 
@@ -68,7 +74,7 @@ export function UploadStats() {
         </Grid>
       )}
       {Boolean(Object.keys(possiblePlayerStats).length) && (
-        <StatUploader possiblePlayers={possiblePlayerStats} />
+        <StatUploader possiblePlayers={possiblePlayerStats} teamData={teamData} />
       )}
     </Grid>
   );
