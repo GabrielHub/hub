@@ -41,19 +41,19 @@ StatCard.propTypes = {
   data: PropTypes.shape({
     name: PropTypes.string,
     grade: PropTypes.string,
-    team: PropTypes.number,
-    pos: PropTypes.number,
-    pts: PropTypes.string,
-    treb: PropTypes.string,
-    ast: PropTypes.string,
-    stl: PropTypes.string,
-    blk: PropTypes.string,
-    pf: PropTypes.string,
-    tov: PropTypes.string,
-    fgm: PropTypes.string,
-    fga: PropTypes.number,
-    threepm: PropTypes.string,
-    threepa: PropTypes.number
+    team: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    pos: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    pts: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    treb: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    ast: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    stl: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    blk: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    pf: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    tov: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    fgm: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    fga: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    threepm: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    threepa: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   }).isRequired
 };
 

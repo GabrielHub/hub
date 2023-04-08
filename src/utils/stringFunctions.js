@@ -68,7 +68,7 @@ export const parseTeamTotalData = (input) => {
       const [threepm = 0, threepa = 0] = threep.split('/');
 
       // * We'll automatically calculate % and FTM/FTA and advanced stats based on the following inputs
-      result[word] = {
+      result[Object.keys(result).length + 1] = {
         team: Object.keys(result).length + 1,
         grd,
         pts,
@@ -133,6 +133,24 @@ export const parseTeamTotalData = (input) => {
  */
 export const removeSpecialCharacters = (str) => {
   return str.replace(/[^0-9a-zA-Z/ ]+/g, '');
+};
+
+// dec2hex :: Integer -> String
+// i.e. 0-255 -> '00'-'ff'
+function dec2hex(dec) {
+  return dec.toString(16).padStart(2, '0');
+}
+
+// * Uses solution from https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+/**
+ * @description used to generate a random key when we add players during the upload
+ * @returns string
+ */
+export const generateRandomKey = () => {
+  const len = 10;
+  const arr = new Uint8Array((len || 40) / 2);
+  window.crypto.getRandomValues(arr);
+  return Array.from(arr, dec2hex).join('');
 };
 
 export default {};

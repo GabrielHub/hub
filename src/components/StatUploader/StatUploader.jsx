@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Grid, Button, Typography } from '@mui/material';
+import { generateRandomKey } from 'utils';
 import { StatCard } from './StatCard';
 import { TeamCard } from './TeamCard';
 
@@ -12,7 +13,7 @@ export function StatUploader(props) {
 
   // * Editable list of team data
   const [firstTeamData, setFirstTeamData] = useState(teamData[Object.keys(teamData)[0]]);
-  const [secondTeamData, setSecondTeamData] = useState(teamData[Object.keys(teamData)[0]]);
+  const [secondTeamData, setSecondTeamData] = useState(teamData[Object.keys(teamData)[1]]);
 
   const updatePlayerValue = (player, valueKey, value) => {
     setPlayerList({
@@ -30,7 +31,7 @@ export function StatUploader(props) {
         ...firstTeamData,
         [valueKey]: value
       });
-    } else {
+    } else if (teamKey === 2) {
       setSecondTeamData({
         ...secondTeamData,
         [valueKey]: value
@@ -47,7 +48,28 @@ export function StatUploader(props) {
     });
   };
 
-  // * Calculate and parse full player values and upload
+  const addPlayer = () => {
+    setPlayerList({
+      ...playerList,
+      [generateRandomKey()]: {
+        name: 'AI Player',
+        grade: 'A',
+        team: 1,
+        pos: 1,
+        pts: 0,
+        treb: 0,
+        ast: 0,
+        stl: 0,
+        blk: 0,
+        pf: 0,
+        tov: 0,
+        fgm: 0,
+        fga: 0,
+        threepm: 0,
+        threepa: 0
+      }
+    });
+  };
 
   return (
     <Grid xs={12} container item>
@@ -56,20 +78,15 @@ export function StatUploader(props) {
           <b>TEAM STATS</b>
         </Typography>
       </Grid>
-      <TeamCard
-        teamData={teamData[Object.keys(teamData)[0]]}
-        teamKey={Object.keys(teamData)[0]}
-        onChange={updateTeamData}
-      />
-      <TeamCard
-        teamData={teamData[Object.keys(teamData)[1]]}
-        teamKey={Object.keys(teamData)[1]}
-        onChange={updateTeamData}
-      />
+      <TeamCard teamData={firstTeamData} teamKey={1} onChange={updateTeamData} />
+      <TeamCard teamData={secondTeamData} teamKey={2} onChange={updateTeamData} />
       <Grid xs={12} item>
         <Typography variant="h5" gutterBottom>
           <b>PLAYER STATS</b>
         </Typography>
+        <Button color="primary" variant="contained" onClick={addPlayer}>
+          ADD
+        </Button>
       </Grid>
       {Boolean(Object.keys(playerList).length) &&
         Object.keys(playerList).map((player) => (

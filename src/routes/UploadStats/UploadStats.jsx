@@ -29,7 +29,9 @@ export function UploadStats() {
   }, [imageData]);
 
   const handleImageChange = (e) => {
-    setImageData(URL.createObjectURL(e.target.files[0]));
+    if (e.target.files?.length) {
+      setImageData(URL.createObjectURL(e.target.files[0]));
+    }
   };
 
   const handleReset = () => {
@@ -37,6 +39,7 @@ export function UploadStats() {
     setConfidence(null);
     setProgress(0);
     setPossiblePlayerStats({});
+    setTeamData(null);
   };
 
   useEffect(() => {
@@ -65,11 +68,12 @@ export function UploadStats() {
       </Grid>
       {Boolean(imageData) && (
         <Grid item>
-          <img style={{ width: 800 }} src={imageData} alt="uploaded" />
-          <Typography>Recognizing Image: {progress}</Typography>
+          <img style={{ width: '50vw', margin: 'auto' }} src={imageData} alt="uploaded" />
+          {(progress !== 0 || progress !== 100) && (
+            <Typography>Recognizing Image: {progress}%</Typography>
+          )}
           <Typography gutterBottom>
-            <b>Confidence:</b> {confidence} | If confidence is below 80% you will likely have to
-            update the data below
+            <b>Confidence:</b> {confidence}%
           </Typography>
         </Grid>
       )}
