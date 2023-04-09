@@ -13,18 +13,18 @@ export const parsePossiblePlayerData = (input) => {
   input.forEach((word, index) => {
     if (word.length > 5 && !commonErrors.includes(word)) {
       // * get the next 10 words (stats) after finding a possible name
-      const [grade, pts, treb, ast, stl, blk, pf, tov, fg, threep] = input.slice(
+      const [grd, pts, treb, ast, stl, blk, pf, tov, fg, threep] = input.slice(
         index + 1,
         index + 11
       );
 
-      const [fgm = 0, fga = 0] = fg.split('/');
-      const [threepm = 0, threepa = 0] = threep.split('/');
+      const [fgm = 0, fga = 0] = fg ? fg.split('/') : [0, 0];
+      const [threepm = 0, threepa = 0] = threep ? threep.split('/') : [0, 0];
 
       // * We'll automatically calculate % and FTM/FTA and advanced stats based on the following inputs
       result[word] = {
         name: word,
-        grade,
+        grd,
         team: 1,
         // TODO Map 1 - 5 to readable PG - C
         pos: 1, // * POS Defined by 1 - 5
@@ -55,10 +55,9 @@ export const parseTeamTotalData = (input) => {
   const result = {};
   const keyword = 'TOTAL';
 
-  // * Assume that player names will likely be longer than 5 letters
   input.forEach((word, index) => {
     if (word === keyword) {
-      // * get the next 10 words (stats) after finding a possible name
+      // * get the next 10 words (stats) after finding a possible team
       const [grd, pts, reb, ast, stl, blk, pf, tov, fg, threep] = input.slice(
         index + 1,
         index + 11

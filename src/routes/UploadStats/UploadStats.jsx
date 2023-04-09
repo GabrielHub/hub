@@ -51,30 +51,32 @@ export function UploadStats() {
 
   return (
     <Grid sx={{ padding: 1 }} container>
-      <Grid xs={12} item>
+      <Grid xs={8} item>
         <Typography variant="h4" gutterBottom>
           Upload an screenshot of a Rec/Pro-Am game
         </Typography>
       </Grid>
-      <Grid xs={12} item>
+      <Grid xs={2} item>
         <Button variant="contained" component="label">
           Upload Image <input hidden accept="image/*" type="file" onClick={handleImageChange} />
         </Button>
-        {Boolean(imageData) && (
+      </Grid>
+      {Boolean(imageData) && (
+        <Grid xs={2} item>
           <Button variant="contained" component="label" color="error" onClick={handleReset}>
             RESET
           </Button>
-        )}
-      </Grid>
+        </Grid>
+      )}
       {Boolean(imageData) && (
-        <Grid item>
+        <Grid container item>
           <img style={{ width: '50vw', margin: 'auto' }} src={imageData} alt="uploaded" />
-          {(progress !== 0 || progress !== 100) && (
-            <Typography>Recognizing Image: {progress}%</Typography>
+          {Boolean(progress) && <Typography>Recognizing Image: {progress}%</Typography>}
+          {Boolean(confidence) && (
+            <Typography gutterBottom>
+              <b>Confidence:</b> {confidence}%
+            </Typography>
           )}
-          <Typography gutterBottom>
-            <b>Confidence:</b> {confidence}%
-          </Typography>
         </Grid>
       )}
       {Boolean(Object.keys(possiblePlayerStats).length) && (

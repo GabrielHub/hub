@@ -5,6 +5,7 @@ const express = require('express');
 
 const storeGM = require('./api/lookup');
 const getPopularity = require('./api/popularity');
+const uploadStats = require('./api/upload');
 
 admin.initializeApp();
 
@@ -24,5 +25,6 @@ const corsOptionsDelegate = (req, callback) => {
 
 app.post('/lookup', cors(corsOptionsDelegate), storeGM);
 app.get('/popularity', cors(corsOptionsDelegate), getPopularity);
+app.post('/upload', cors(corsOptionsDelegate), uploadStats);
 
 exports.app = functions.https.onRequest(app);

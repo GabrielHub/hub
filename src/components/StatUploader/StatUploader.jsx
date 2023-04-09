@@ -71,6 +71,10 @@ export function StatUploader(props) {
     });
   };
 
+  const handleStatUpload = async () => {
+    // const formatPlayerStats =
+  };
+
   return (
     <Grid xs={12} container item>
       <Grid xs={12} item>
@@ -80,13 +84,17 @@ export function StatUploader(props) {
       </Grid>
       <TeamCard teamData={firstTeamData} teamKey={1} onChange={updateTeamData} />
       <TeamCard teamData={secondTeamData} teamKey={2} onChange={updateTeamData} />
-      <Grid xs={12} item>
-        <Typography variant="h5" gutterBottom>
-          <b>PLAYER STATS</b>
-        </Typography>
-        <Button color="primary" variant="contained" onClick={addPlayer}>
-          ADD
-        </Button>
+      <Grid xs={12} alignItems="center" container item>
+        <Grid xs={2} item>
+          <Typography variant="h5">
+            <b>PLAYER STATS</b>
+          </Typography>
+        </Grid>
+        <Grid xs={2} item>
+          <Button color="primary" variant="contained" onClick={addPlayer}>
+            ADD
+          </Button>
+        </Grid>
       </Grid>
       {Boolean(Object.keys(playerList).length) &&
         Object.keys(playerList).map((player) => (
@@ -99,7 +107,12 @@ export function StatUploader(props) {
           />
         ))}
       <Grid xs={12} item>
-        <Button color="primary" variant="contained">
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={handleStatUpload}
+          // TODO Improve error handling here? If stats seem unrealistic or have too many characters...
+          disabled={Object.keys(playerList).length !== 10}>
           UPLOAD STATS
         </Button>
       </Grid>

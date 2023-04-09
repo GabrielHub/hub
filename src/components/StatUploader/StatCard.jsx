@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Grid, IconButton, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { PLAYER_STAT_READABLE } from 'constants';
 
 export function StatCard(props) {
   // * player is the key we use to edit data
@@ -24,7 +25,7 @@ export function StatCard(props) {
           <TextField
             variant="outlined"
             name={dataKey}
-            label={dataKey.toUpperCase()}
+            label={PLAYER_STAT_READABLE[dataKey]}
             value={data[dataKey]}
             onChange={_onChange}
           />
@@ -40,7 +41,7 @@ StatCard.propTypes = {
   removePlayer: PropTypes.func.isRequired,
   data: PropTypes.shape({
     name: PropTypes.string,
-    grade: PropTypes.string,
+    grd: PropTypes.string,
     team: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     pos: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     pts: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
