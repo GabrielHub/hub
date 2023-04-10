@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Grid, Button, Typography } from '@mui/material';
 import DoneIcon from '@mui/icons-material/Done';
+import { useSnackbar } from 'notistack';
 import { generateRandomKey } from 'utils';
 import { uploadRawStats } from 'rest';
 import { StatCard } from './StatCard';
@@ -9,6 +10,7 @@ import { TeamCard } from './TeamCard';
 
 export function StatUploader(props) {
   const { possiblePlayers, teamData } = props;
+  const { enqueueSnackbar } = useSnackbar();
 
   // * Editable list of players, this will be the list that gets uploaded
   const [playerList, setPlayerList] = useState(possiblePlayers);
@@ -91,10 +93,13 @@ export function StatUploader(props) {
       [firstTeamData.team]: firstTeamData,
       [secondTeamData.team]: secondTeamData
     };
-    const response = await uploadRawStats(rawPlayerData, rawTeamData);
-    // TODO Error handling (it's very likely invalid data is inputted and incorrect values will return an error)
-    // eslint-disable-next-line no-console
-    console.log('Uploaded data: ', response);
+    const { data, error } = await uploadRawStats(rawPlayerData, rawTeamData);
+    // TODO better Error handling (it's very likely invalid data is inputted and incorrect values will return an error
+    if (error || !data) {
+      enqueueSnackbar('Error uploading data, please try again', { variant: 'error' });
+    } else {
+      enqueueSnackbar('Successfully uploaded data', { variant: 'success' });
+    }
   };
 
   return (
