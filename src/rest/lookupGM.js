@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BASE_URL } from './constants';
+import { FIREBASE_BASE_URL } from 'constants';
 
 /**
  * @description Looks up a gm, and increases their popularity
@@ -13,7 +13,7 @@ export const lookupGM = async (username) => {
   };
 
   await axios
-    .post(`${BASE_URL}/lookup`, body)
+    .post(`${FIREBASE_BASE_URL}/lookup`, body)
     .then((res) => {
       response.data = res.data;
     })

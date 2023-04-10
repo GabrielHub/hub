@@ -7,6 +7,8 @@ const calculateDoubles = require('../utils/calculateDoubles');
 const calculateAdvancedOffensiveStats = require('../utils/calculateAdvancedOffensiveStats');
 const calculateAdvancedDefensiveStats = require('../utils/calculateAdvancedDefensiveStats');
 
+// TODO Error handling. if values return null we should error instead of saving invalid data
+
 // TODO We need to use this until we have more data (league average data)
 const DEFAULT_FT_PERC = 0.72;
 
@@ -109,7 +111,7 @@ const uploadStats = async (req, res) => {
         return team == teamKey && treb > 0;
       })
     );
-    // rawPlayerData.filter((player) => player.team === teamKey && player.treb > 0)
+
     playersOnTeam.forEach((player) => {
       playerReboundData[player.name] = {
         oreb: 0
@@ -183,7 +185,7 @@ const uploadStats = async (req, res) => {
     const ftm = calculateFreeThrowsMade(pts, twopm, threepm);
     const fta = Math.round(ftm / DEFAULT_FT_PERC); // TODO Use account stored FT % if acc already exists
     // * double double, triple doubles, quadruple doubles
-    const { dd, tp, qd } = calculateDoubles(pts, treb, ast, stl, blk);
+    const { dd, td, qd } = calculateDoubles(pts, treb, ast, stl, blk);
 
     // * Add simple stats to player object
     formattedPlayer = {
@@ -196,7 +198,7 @@ const uploadStats = async (req, res) => {
       ftm,
       fta,
       dd,
-      tp,
+      td,
       qd
     };
 

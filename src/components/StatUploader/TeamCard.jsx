@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Grid, TextField } from '@mui/material';
+import { Grid, TextField, IconButton } from '@mui/material';
+import DoneIcon from '@mui/icons-material/Done';
 import { TEAM_STAT_READABLE } from 'constants';
 
 export function TeamCard(props) {
-  const { teamData, teamKey, onChange } = props;
+  const { teamData, teamKey, onChange, updateValidatedTeam } = props;
 
   // eslint-disable-next-line no-underscore-dangle
   const _onChange = (e) => {
@@ -13,6 +14,11 @@ export function TeamCard(props) {
 
   return (
     <Grid sx={{ padding: 2 }} xs={12} container item>
+      <Grid xs item>
+        <IconButton aria-label="done" onClick={() => updateValidatedTeam(teamKey)}>
+          <DoneIcon color="success" size="small" />
+        </IconButton>
+      </Grid>
       {Object.keys(teamData).map((dataKey) => (
         <Grid key={dataKey} xs item>
           <TextField
@@ -31,6 +37,7 @@ export function TeamCard(props) {
 TeamCard.propTypes = {
   teamKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   onChange: PropTypes.func.isRequired,
+  updateValidatedTeam: PropTypes.func.isRequired,
   teamData: PropTypes.shape({
     team: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     grd: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

@@ -1,3 +1,5 @@
+export const FIREBASE_BASE_URL = process.env.REACT_APP_FIREBASE_BASE_URL;
+
 export const TEAM_STAT_READABLE = {
   team: 'TEAM',
   grd: 'GRADE',

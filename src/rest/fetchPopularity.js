@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BASE_URL } from './constants';
+import { FIREBASE_BASE_URL } from 'constants';
 
 /**
  * @description return a list of gms ranked by popularity
@@ -9,7 +9,7 @@ export const fetchPopularity = async () => {
   const response = {};
 
   await axios
-    .get(`${BASE_URL}/popularity`)
+    .get(`${FIREBASE_BASE_URL}/popularity`)
     .then((res) => {
       response.data = res.data;
     })

@@ -11,7 +11,7 @@ const calculateDoubles = (points, rebounds, assists, steals, blocks) => {
 
   return {
     dd: count === 2 ? 1 : 0,
-    tp: count === 3 ? 1 : 0,
+    td: count === 3 ? 1 : 0,
     qd: count === 4 ? 1 : 0
   };
 };

@@ -53,7 +53,7 @@ export function UploadStats() {
     <Grid sx={{ padding: 1 }} container>
       <Grid xs={8} item>
         <Typography variant="h4" gutterBottom>
-          Upload an screenshot of a Rec/Pro-Am game
+          Upload a screenshot of a Rec/Pro-Am game
         </Typography>
       </Grid>
       <Grid xs={2} item>

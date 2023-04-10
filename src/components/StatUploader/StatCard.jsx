@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Grid, IconButton, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DoneIcon from '@mui/icons-material/Done';
 import { PLAYER_STAT_READABLE } from 'constants';
 
 export function StatCard(props) {
   // * player is the key we use to edit data
-  const { player, data, onChange, removePlayer } = props;
+  const { player, data, onChange, removePlayer, updateValidatedPlayer } = props;
 
   // eslint-disable-next-line no-underscore-dangle
   const _onChange = (e) => {
@@ -16,8 +17,8 @@ export function StatCard(props) {
   return (
     <Grid sx={{ padding: 2 }} xs={12} container item>
       <Grid xs item>
-        <IconButton aria-label="delete" onClick={() => removePlayer(player)}>
-          <DeleteIcon color="error" size="small" />
+        <IconButton aria-label="done" onClick={() => updateValidatedPlayer(player)}>
+          <DoneIcon color="success" size="small" />
         </IconButton>
       </Grid>
       {Object.keys(data).map((dataKey) => (
@@ -31,6 +32,11 @@ export function StatCard(props) {
           />
         </Grid>
       ))}
+      <Grid xs item>
+        <IconButton aria-label="delete" onClick={() => removePlayer(player)}>
+          <DeleteIcon color="error" size="small" />
+        </IconButton>
+      </Grid>
     </Grid>
   );
 }
@@ -39,6 +45,7 @@ StatCard.propTypes = {
   player: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   removePlayer: PropTypes.func.isRequired,
+  updateValidatedPlayer: PropTypes.func.isRequired,
   data: PropTypes.shape({
     name: PropTypes.string,
     grd: PropTypes.string,

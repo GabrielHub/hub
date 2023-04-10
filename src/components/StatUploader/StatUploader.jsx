@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Grid, Button, Typography } from '@mui/material';
+import DoneIcon from '@mui/icons-material/Done';
 import { generateRandomKey } from 'utils';
+import { uploadRawStats } from 'rest';
 import { StatCard } from './StatCard';
 import { TeamCard } from './TeamCard';
 
@@ -14,6 +16,18 @@ export function StatUploader(props) {
   // * Editable list of team data
   const [firstTeamData, setFirstTeamData] = useState(teamData[Object.keys(teamData)[0]]);
   const [secondTeamData, setSecondTeamData] = useState(teamData[Object.keys(teamData)[1]]);
+
+  // * Manually confirm each set of stats, these keep track of what has been confirmed and hides confirmed stats
+  const [validatedTeams, setValidatedTeams] = useState([]);
+  const [validatedPlayers, setValidatedPlayers] = useState([]);
+
+  const updateValidatedTeam = (teamKey) => {
+    setValidatedTeams((current) => [...current, teamKey]);
+  };
+
+  const updateValidatedPlayer = (playerKey) => {
+    setValidatedPlayers((current) => [...current, playerKey]);
+  };
 
   const updatePlayerValue = (player, valueKey, value) => {
     setPlayerList({
@@ -72,7 +86,15 @@ export function StatUploader(props) {
   };
 
   const handleStatUpload = async () => {
-    // const formatPlayerStats =
+    const rawPlayerData = Object.keys(playerList).map((playerKey) => playerList[playerKey]);
+    const rawTeamData = {
+      [firstTeamData.team]: firstTeamData,
+      [secondTeamData.team]: secondTeamData
+    };
+    const response = await uploadRawStats(rawPlayerData, rawTeamData);
+    // TODO Error handling (it's very likely invalid data is inputted and incorrect values will return an error)
+    // eslint-disable-next-line no-console
+    console.log('Uploaded data: ', response);
   };
 
   return (
@@ -81,9 +103,25 @@ export function StatUploader(props) {
         <Typography variant="h5" gutterBottom>
           <b>TEAM STATS</b>
         </Typography>
+        {Boolean(validatedTeams.length) &&
+          validatedTeams.map((teamKey) => <DoneIcon key={teamKey} color="success" size="small" />)}
       </Grid>
-      <TeamCard teamData={firstTeamData} teamKey={1} onChange={updateTeamData} />
-      <TeamCard teamData={secondTeamData} teamKey={2} onChange={updateTeamData} />
+      {!validatedTeams.includes(1) && (
+        <TeamCard
+          teamData={firstTeamData}
+          teamKey={1}
+          onChange={updateTeamData}
+          updateValidatedTeam={updateValidatedTeam}
+        />
+      )}
+      {!validatedTeams.includes(2) && (
+        <TeamCard
+          teamData={secondTeamData}
+          teamKey={2}
+          onChange={updateTeamData}
+          updateValidatedTeam={updateValidatedTeam}
+        />
+      )}
       <Grid xs={12} alignItems="center" container item>
         <Grid xs={2} item>
           <Typography variant="h5">
@@ -97,15 +135,28 @@ export function StatUploader(props) {
         </Grid>
       </Grid>
       {Boolean(Object.keys(playerList).length) &&
-        Object.keys(playerList).map((player) => (
-          <StatCard
-            key={player}
-            player={player}
-            data={playerList[player]}
-            onChange={updatePlayerValue}
-            removePlayer={removePlayer}
-          />
-        ))}
+        Object.keys(playerList).map((player) => {
+          if (!validatedPlayers.includes(player)) {
+            return (
+              <StatCard
+                key={player}
+                player={player}
+                data={playerList[player]}
+                onChange={updatePlayerValue}
+                removePlayer={removePlayer}
+                updateValidatedPlayer={updateValidatedPlayer}
+              />
+            );
+          }
+          return (
+            <Grid key={player} xs item>
+              <Typography sx={{ padding: 1 }}>
+                {playerList[player].name}{' '}
+                <DoneIcon sx={{ padding: 1 }} color="success" size="small" />
+              </Typography>
+            </Grid>
+          );
+        })}
       <Grid xs={12} item>
         <Button
           color="primary"

@@ -66,7 +66,7 @@ export const parseTeamTotalData = (input) => {
       const [fgm = 0, fga = 0] = fg.split('/');
       const [threepm = 0, threepa = 0] = threep.split('/');
 
-      // * We'll automatically calculate % and FTM/FTA and advanced stats based on the following inputs
+      // * We'll automatically calculate % and FTM/FTA and advanced stats in the backend based on the following inputs
       result[Object.keys(result).length + 1] = {
         team: Object.keys(result).length + 1,
         grd,
