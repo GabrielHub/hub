@@ -1,4 +1,5 @@
 // const admin = require('firebase-admin');
+const _ = require('lodash');
 const mockData = require('../mocks/mockUploadData');
 const calculateTwoPointers = require('../utils/calculateTwoPointers');
 const calculateFreeThrowsMade = require('../utils/calculateFreeThrows');
@@ -8,6 +9,17 @@ const calculateAdvancedDefensiveStats = require('../utils/calculateAdvancedDefen
 
 // TODO We need to use this until we have more data (league average data)
 const DEFAULT_FT_PERC = 0.72;
+
+// ? Used to estimate OREB
+const FG_OREB_PERC = 0.22;
+const THREEP_OREB_PERC = 0.28;
+
+const getExpectedORebounds = (treb, expected) => {
+  const stdDev = treb / 6;
+  const randomNumber = stdDev * (2 * Math.random() - 1);
+  const finalNumber = Math.min(Math.max(randomNumber + expected, 0), treb);
+  return Math.floor(finalNumber);
+};
 
 /**
  * @description format then upload player stats
@@ -22,8 +34,25 @@ const uploadStats = async (req, res) => {
   // * Must be a unique position for each player ( 1 - 5 ) to match opposing players
 
   const formattedTeamData = {};
+  const teamReboundData = {};
+  const playerReboundData = {};
 
-  // * Calculate oreb for both teams first (estimations)
+  // * Calculate oreb for both teams first (estimations) then set basic stats
+  Object.keys(mockData.rawTeamData).forEach((teamKey) => {
+    const teamData = mockData.rawTeamData[teamKey];
+    const { reb, fgm, fga, threepm, threepa } = teamData;
+    const missed3P = threepa - threepm;
+    const missed2P = fga - fgm - missed3P;
+
+    const expected = Math.floor(missed3P * THREEP_OREB_PERC + missed2P * FG_OREB_PERC);
+    const oreb = getExpectedORebounds(reb, expected);
+    const dreb = Math.abs(reb - oreb);
+
+    teamReboundData[teamKey] = {
+      dreb,
+      oreb
+    };
+  });
 
   Object.keys(mockData.rawTeamData).forEach((teamKey) => {
     const mp = 100; // * Each games is 20 minutes so total minutes is always 100
@@ -49,12 +78,8 @@ const uploadStats = async (req, res) => {
     const opFTM = calculateFreeThrowsMade(opponent.pts, oppTwoPM, opponent.threepm) || 1;
     const opFTA = Math.round(opFTM / DEFAULT_FT_PERC) || 1;
 
-    // TODO Figure out a way to calculate OREB
-    const dreb = reb;
-    const oreb = 0;
-    // * Team ORB% cannot be calculated so keep it at 0%
-    const ORBPerc = oreb / (oreb + (opponent.reb + 0));
-    const ORBPart = 0;
+    const { dreb, oreb } = teamReboundData[teamKey];
+    const ORBPerc = oreb / (oreb + (opponent.reb + teamReboundData[opponent.team].oreb));
 
     // * Possessions
     const scoringPoss = fgm + (1 - (1 - (ftm / fta) ** 2)) * fta * 0.4;
@@ -74,6 +99,36 @@ const uploadStats = async (req, res) => {
     const ORBWeight =
       ((1 - ORBPerc) * playPerc) / ((1 - ORBPerc) * playPerc + ORBPerc * (1 - playPerc));
 
+    // * Randomly assign offensive rebounds to individual players
+    const playersOnTeam = _.shuffle(
+      _.filter(mockData.rawPlayerData, ({ team, treb }) => {
+        // * Sometimes team is a number... sometimes it's a string ugh
+        // eslint-disable-next-line eqeqeq
+        return team == teamKey && treb > 0;
+      })
+    );
+    // mockData.rawPlayerData.filter((player) => player.team === teamKey && player.treb > 0)
+    playersOnTeam.forEach((player) => {
+      playerReboundData[player.name] = {
+        oreb: 0
+      };
+    });
+
+    let orebCount = oreb;
+
+    // * Loop through the players and assign oreb to their reb property
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < playersOnTeam.length && orebCount > 0; i++) {
+      const player = playersOnTeam[i];
+      const maxReb = player.treb;
+      const maxAssign = Math.min(orebCount, maxReb);
+      const reboundsAssigned = Math.floor(Math.random() * maxAssign) + 1;
+      playerReboundData[player.name].oreb += reboundsAssigned;
+      orebCount -= reboundsAssigned; // * decrease oreb by the amount assigned
+      // TODO This may not assign all rebounds. But this is an estimation anyway so whatever, this can be improved later
+      // TODO Also if there are replicating names (ex. AI Player) they'll end up with the same oboards
+    }
+
     formattedTeamData[teamKey] = {
       ...teamData,
       totalPoss,
@@ -84,7 +139,6 @@ const uploadStats = async (req, res) => {
       dreb,
       oreb,
       ORBPerc,
-      ORBPart,
       scoringPoss,
       playPerc,
       ORBWeight,
@@ -96,7 +150,20 @@ const uploadStats = async (req, res) => {
     let formattedPlayer = {};
     // * Load image recognized stats first
     // * Destructure stats that we'll use for calculations and readability
-    const { team: teamKey, pts, pos, treb, ast, stl, blk, fgm, fga, threepm, threepa } = playerData;
+    const {
+      team: teamKey,
+      name,
+      pts,
+      pos,
+      treb,
+      ast,
+      stl,
+      blk,
+      fgm,
+      fga,
+      threepm,
+      threepa
+    } = playerData;
 
     // * Team data ( might be a waste of space...? )
     const team = formattedTeamData[teamKey];
@@ -108,13 +175,13 @@ const uploadStats = async (req, res) => {
     const mp = 20;
 
     // * Assume there are no offensive rebounds since we have no way of figuring out oreb
-    const dreb = treb;
-    const oreb = 0;
+    const { oreb = 0 } = playerReboundData[name] || {};
+    const dreb = treb - oreb;
     // * Get 2PM to figure out FTM
     const { twopa, twopm } = calculateTwoPointers(fga, fgm, threepa, threepm);
     // * We cannot get the FTA without knowing FT%, so just calculate FTM
     const ftm = calculateFreeThrowsMade(pts, twopm, threepm);
-    const fta = Math.round(ftm / DEFAULT_FT_PERC); // TODO Use account stored FT %
+    const fta = Math.round(ftm / DEFAULT_FT_PERC); // TODO Use account stored FT % if acc already exists
     // * double double, triple doubles, quadruple doubles
     const { dd, tp, qd } = calculateDoubles(pts, treb, ast, stl, blk);
 
@@ -137,10 +204,12 @@ const uploadStats = async (req, res) => {
     const { ortg, floorPerc, astPerc, tovPerc, usageRate, gameScore } =
       calculateAdvancedOffensiveStats(formattedPlayer, team);
 
+    const opOREB = playerReboundData[opponent.name]?.oreb || 0;
     // * Calculate advanced defensive stats
     const { drtg, drebPerc, oFGA, oFGM, o3PA, o3PM } = calculateAdvancedDefensiveStats(
       formattedPlayer,
       opponent,
+      opOREB,
       team
     );
 

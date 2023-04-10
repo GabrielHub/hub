@@ -4,7 +4,7 @@ const calculateFreeThrowsMade = require('./calculateFreeThrows');
 // TODO We need to use this until we have more data (league average data)
 const DEFAULT_FT_PERC = 0.72;
 
-const calculateAdvancedDefensiveStats = (player, opponent, team) => {
+const calculateAdvancedDefensiveStats = (player, opponent, opOREB, team) => {
   // * Calculating advanced defensive stats (we only calculate the advanced stats that require opponent or team numbers)
   // * Stats that do not require opponent or team info we can average elsewhere
 
@@ -21,9 +21,7 @@ const calculateAdvancedDefensiveStats = (player, opponent, team) => {
   const opFTDivision = opFTA !== 0 ? opFTM / opFTA : 1;
   const opMin = 20;
 
-  // * assuming opponent oreb is 0, otherwise Opponent_ORB / (Opponent_ORB + Team_DRB)
-
-  const dorPerc = 0;
+  const dorPerc = opOREB / (opOREB + team.dreb);
   const dfgPerc = opponent.fgm / opponent.fga;
   const FMWT = (dfgPerc * (1 - dorPerc)) / (dfgPerc * (1 - dorPerc) + (1 - dfgPerc) * dorPerc);
   const stops =
@@ -51,7 +49,7 @@ const calculateAdvancedDefensiveStats = (player, opponent, team) => {
     (100 * (player.blk * (team.mp / 5))) / (player.mp * (opponent.fga - opponent.threepa)); */
 
   // * DRB%: the percentage of available defensive rebounds a player grabbed while he was on the floor. 0 is the opponents offensive rebounds
-  const drebPerc = (100 * (player.dreb * (team.mp / 5))) / (player.mp * (team.reb + 0));
+  const drebPerc = (100 * (player.dreb * (team.mp / 5))) / (player.mp * (team.dreb + opOREB));
 
   // * STL%: estimate of the percentage of opponent possessions that end with a steal by the player while he was on the floor
   // TODO I can't calculate this without the opponnents possessions

@@ -20,7 +20,7 @@ const calculateAdvancedOffensiveStats = (player, team) => {
     ((team.pts - team.ftm - (player.pts - player.ftm)) / (2 * (team.fga - player.fga))) *
     player.ast;
   const ftPart = (1 - (1 - ftDivision)) ** 2 * 0.4 * player.fta;
-  const orbPart = 0;
+  const orbPart = player.oreb * team.ORBWeight * team.playPerc;
 
   const scoringPoss =
     (fgPart + astPart + ftPart) *
