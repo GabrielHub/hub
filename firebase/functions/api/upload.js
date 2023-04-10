@@ -1,6 +1,6 @@
-// const admin = require('firebase-admin');
+const admin = require('firebase-admin');
 const _ = require('lodash');
-const mockData = require('../mocks/mockUploadData');
+// const mockData = require('../mocks/mockUploadData');
 const calculateTwoPointers = require('../utils/calculateTwoPointers');
 const calculateFreeThrowsMade = require('../utils/calculateFreeThrows');
 const calculateDoubles = require('../utils/calculateDoubles');
@@ -33,13 +33,15 @@ const uploadStats = async (req, res) => {
   // * Combined stats of each player on each team should add up to respective rawTeamData
   // * Must be a unique position for each player ( 1 - 5 ) to match opposing players
 
+  const { rawTeamData, rawPlayerData } = req.body;
+
   const formattedTeamData = {};
   const teamReboundData = {};
   const playerReboundData = {};
 
   // * Calculate oreb for both teams first (estimations) then set basic stats
-  Object.keys(mockData.rawTeamData).forEach((teamKey) => {
-    const teamData = mockData.rawTeamData[teamKey];
+  Object.keys(rawTeamData).forEach((teamKey) => {
+    const teamData = rawTeamData[teamKey];
     const { reb, fgm, fga, threepm, threepa } = teamData;
     const missed3P = threepa - threepm;
     const missed2P = fga - fgm - missed3P;
@@ -54,13 +56,13 @@ const uploadStats = async (req, res) => {
     };
   });
 
-  Object.keys(mockData.rawTeamData).forEach((teamKey) => {
+  Object.keys(rawTeamData).forEach((teamKey) => {
     const mp = 100; // * Each games is 20 minutes so total minutes is always 100
 
     // * Load image recognized stats first
     // * Destructure stats that we'll use for calculations and readability
-    const teamData = mockData.rawTeamData[teamKey];
-    const opponent = teamKey === 1 ? mockData.rawTeamData[2] : mockData.rawTeamData[1];
+    const teamData = rawTeamData[teamKey];
+    const opponent = teamKey === 1 ? rawTeamData[2] : rawTeamData[1];
     const { pts, reb, tov, fgm, fga, threepm, threepa } = teamData;
 
     // TODO Figure out a way to do team FTA and FT. They cannot be 0 or it breaks further calculations
@@ -101,13 +103,13 @@ const uploadStats = async (req, res) => {
 
     // * Randomly assign offensive rebounds to individual players
     const playersOnTeam = _.shuffle(
-      _.filter(mockData.rawPlayerData, ({ team, treb }) => {
+      _.filter(rawPlayerData, ({ team, treb }) => {
         // * Sometimes team is a number... sometimes it's a string ugh
         // eslint-disable-next-line eqeqeq
         return team == teamKey && treb > 0;
       })
     );
-    // mockData.rawPlayerData.filter((player) => player.team === teamKey && player.treb > 0)
+    // rawPlayerData.filter((player) => player.team === teamKey && player.treb > 0)
     playersOnTeam.forEach((player) => {
       playerReboundData[player.name] = {
         oreb: 0
@@ -146,7 +148,7 @@ const uploadStats = async (req, res) => {
     };
   });
 
-  const formattedPlayerData = mockData.rawPlayerData.map((playerData) => {
+  const formattedPlayerData = rawPlayerData.map((playerData) => {
     let formattedPlayer = {};
     // * Load image recognized stats first
     // * Destructure stats that we'll use for calculations and readability
@@ -167,9 +169,7 @@ const uploadStats = async (req, res) => {
 
     // * Team data ( might be a waste of space...? )
     const team = formattedTeamData[teamKey];
-    const opponent = mockData.rawPlayerData.find(
-      (player) => player.pos === pos && player.team !== teamKey
-    );
+    const opponent = rawPlayerData.find((player) => player.pos === pos && player.team !== teamKey);
 
     // * minutes played
     const mp = 20;
@@ -230,7 +230,17 @@ const uploadStats = async (req, res) => {
     };
   });
 
-  // TODO Upload to firestore
+  // * Batch writes
+  const batch = admin.firestore().batch();
+  formattedPlayerData.forEach((player) => {
+    const gamesRef = admin.firestore().collection('games').doc();
+    batch.set(gamesRef, player);
+  });
+
+  await batch.commit().then((docRef) => {
+    // eslint-disable-next-line no-console
+    console.log('Document written with ID: ', docRef.id);
+  });
 
   res.json({ formattedPlayerData, formattedTeamData });
 };
