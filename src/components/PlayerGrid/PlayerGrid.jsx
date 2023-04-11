@@ -41,6 +41,7 @@ export function PlayerGrid(props) {
         columns={columns}
         sortingMode="server"
         paginationMode="server"
+        rowCount={10}
         onSortModelChange={(newSortModel) => setSortModel(newSortModel)}
         autoHeight
         autoPageSize
