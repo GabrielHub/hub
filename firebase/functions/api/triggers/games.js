@@ -44,7 +44,11 @@ const upsertPlayerData = async (snapshot) => {
       const gameData = gameDataRef.docs.map((doc) => doc.data());
 
       const avgPlayerStats = calculateAveragePlayerStats(gameData, name);
-      await db.collection('players').add(avgPlayerStats);
+      await db.collection('players').add({
+        ...avgPlayerStats,
+        _createdAt: admin.firestore.Timestamp.now(),
+        _updatedAt: admin.firestore.Timestamp.now()
+      });
     } else {
       // * collect all games by ALIAS includes NAME and use that for the calculate function
       // * There could theoretically be bad data, and an alias could be in multiple players. Avoid this by taking the first
@@ -61,7 +65,14 @@ const upsertPlayerData = async (snapshot) => {
 
       const avgPlayerStats = calculateAveragePlayerStats(gameData, storedName, alias, ftPerc);
 
-      await db.collection('players').doc(id).set(avgPlayerStats);
+      await db
+        .collection('players')
+        .doc(id)
+        .set({
+          ...avgPlayerStats,
+          _createdAt: admin.firestore.Timestamp.now(),
+          _updatedAt: admin.firestore.Timestamp.now()
+        });
     }
 
     gameRef.update({

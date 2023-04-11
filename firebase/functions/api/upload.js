@@ -236,7 +236,11 @@ const uploadStats = async (req, res) => {
   const batch = admin.firestore().batch();
   formattedPlayerData.forEach((player) => {
     const gamesRef = admin.firestore().collection('games').doc();
-    batch.set(gamesRef, player);
+    batch.set(gamesRef, {
+      ...player,
+      _createdAt: admin.firestore.Timestamp.now(),
+      _updatedAt: admin.firestore.Timestamp.now()
+    });
   });
 
   await batch.commit().then((docRef) => {
