@@ -1,5 +1,6 @@
 import { ErrorBoundary } from 'components/ErrorBoundary';
-import { Root } from './Root/root';
+import { Navbar } from 'components/Navbar';
+import { Root } from './Root';
 import { ImageCarousel } from './ImageCarousel';
 import { GM } from './GM';
 import { UploadStats } from './UploadStats';
@@ -7,9 +8,14 @@ import { UploadStats } from './UploadStats';
 export const routerConfig = [
   {
     path: '/hub',
-    element: <Root />,
+    element: <Navbar />,
     errorElement: <ErrorBoundary />,
     children: [
+      // * Home
+      {
+        index: true,
+        element: <Root />
+      },
       // * StartPlaying Technical Demo
       {
         path: '/hub/carousel',

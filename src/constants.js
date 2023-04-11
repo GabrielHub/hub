@@ -1,4 +1,7 @@
 export const FIREBASE_BASE_URL = process.env.REACT_APP_FIREBASE_BASE_URL;
+export const FIREBASE_API_KEY = process.env.REACT_APP_API_KEY;
+export const FIREBASE_AUTH_DOMAIN = process.env.REACT_APP_AUTH_DOMAIN;
+export const FIREBASE_PROJECT_ID = process.env.REACT_APP_FIREBASE_PROJECT_ID;
 
 export const TEAM_STAT_READABLE = {
   team: 'TEAM',
