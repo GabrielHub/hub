@@ -8,7 +8,7 @@ const round = require('./roundForReadable');
  * @param {*} ftPerc
  * @returns
  */
-const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 0.5) => {
+const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) => {
   // TODO Calculate PER, Pace and Add PProd (points produced) and stops
   // * These are not values we want to average
   // * FT% is a constant defined by the user. We won't update this ever programatically
@@ -83,6 +83,7 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 0.5) =
   playerData.efgPerc =
     round(100 * ((playerData.fgm + 0.5 ** playerData.threepm) / playerData.fga)) || null;
   playerData.threepAR = round(100 * (playerData.threepa / playerData.fga));
+  playerData.astToRatio = round(100 * (playerData.ast / playerData.tov));
 
   // * Defensive stats (opponent efficiency)
   playerData.oFGPerc = round(100 * (playerData.oFGM / playerData.oFGA)) || null;

@@ -38,12 +38,30 @@ const upsertPlayerData = async (snapshot) => {
       .where('alias', 'array-contains', name)
       .get();
 
+    // * Requery for all game data and overwrite playerdata to fix data errors and essentially resync data
     if (playerQuerySnapshot.empty) {
-      const playerData = calculateAveragePlayerStats([data], name);
-      await db.collection('players').add(playerData);
+      const gameDataRef = await db.collection('games').where('name', '==', name).get();
+      const gameData = gameDataRef.docs.map((doc) => doc.data());
+
+      const avgPlayerStats = calculateAveragePlayerStats(gameData, name);
+      await db.collection('players').add(avgPlayerStats);
     } else {
-      // TODO Finish updating
-      // * We have a player, fetch data and update values
+      // * collect all games by ALIAS includes NAME and use that for the calculate function
+      // * There could theoretically be bad data, and an alias could be in multiple players. Avoid this by taking the first
+      // TODO Error notifications/logs if there are more than one unique alias in someone's aliases?
+      // * This should always return valid data
+      const playerData = playerQuerySnapshot.docs.map((doc) => {
+        return { ...doc.data(), id: doc.id };
+      })[0];
+
+      const { name: storedName, alias, ftPerc, id } = playerData;
+
+      const gameDataRef = await db.collection('games').where('name', 'in', alias).get();
+      const gameData = gameDataRef.docs.map((doc) => doc.data());
+
+      const avgPlayerStats = calculateAveragePlayerStats(gameData, storedName, alias, ftPerc);
+
+      await db.collection('players').doc(id).set(avgPlayerStats);
     }
 
     gameRef.update({

@@ -6,6 +6,7 @@ const express = require('express');
 const storeGM = require('./api/lookup');
 const getPopularity = require('./api/popularity');
 const uploadStats = require('./api/upload');
+const testFirebaseStuff = require('./api/testFirebaseStuff');
 
 const upsertPlayerData = require('./api/triggers/games');
 
@@ -29,6 +30,7 @@ const corsOptionsDelegate = (req, callback) => {
 app.post('/lookup', cors(corsOptionsDelegate), storeGM);
 app.get('/popularity', cors(corsOptionsDelegate), getPopularity);
 app.post('/upload', cors(corsOptionsDelegate), uploadStats);
+app.get('/testFunctions', cors(corsOptionsDelegate), testFirebaseStuff);
 exports.app = functions.https.onRequest(app);
 
 // * Cloud Triggers
