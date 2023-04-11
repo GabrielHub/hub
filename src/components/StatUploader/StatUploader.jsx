@@ -5,12 +5,15 @@ import DoneIcon from '@mui/icons-material/Done';
 import { useSnackbar } from 'notistack';
 import { generateRandomKey } from 'utils';
 import { uploadRawStats } from 'rest';
+import { Loading } from 'components/Loading';
 import { StatCard } from './StatCard';
 import { TeamCard } from './TeamCard';
 
 export function StatUploader(props) {
   const { possiblePlayers, teamData } = props;
   const { enqueueSnackbar } = useSnackbar();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   // * Editable list of players, this will be the list that gets uploaded
   const [playerList, setPlayerList] = useState(possiblePlayers);
@@ -88,6 +91,7 @@ export function StatUploader(props) {
   };
 
   const handleStatUpload = async () => {
+    setIsLoading(true);
     const rawPlayerData = Object.keys(playerList).map((playerKey) => playerList[playerKey]);
     const rawTeamData = {
       [firstTeamData.team]: firstTeamData,
@@ -100,79 +104,85 @@ export function StatUploader(props) {
     } else {
       enqueueSnackbar('Successfully uploaded data', { variant: 'success' });
     }
+    setIsLoading(false);
   };
 
   return (
-    <Grid xs={12} container item>
-      <Grid xs={12} item>
-        <Typography variant="h5" gutterBottom>
-          <b>TEAM STATS</b>
-        </Typography>
-        {Boolean(validatedTeams.length) &&
-          validatedTeams.map((teamKey) => <DoneIcon key={teamKey} color="success" size="small" />)}
-      </Grid>
-      {!validatedTeams.includes(1) && (
-        <TeamCard
-          teamData={firstTeamData}
-          teamKey={1}
-          onChange={updateTeamData}
-          updateValidatedTeam={updateValidatedTeam}
-        />
-      )}
-      {!validatedTeams.includes(2) && (
-        <TeamCard
-          teamData={secondTeamData}
-          teamKey={2}
-          onChange={updateTeamData}
-          updateValidatedTeam={updateValidatedTeam}
-        />
-      )}
-      <Grid xs={12} alignItems="center" container item>
-        <Grid xs={2} item>
-          <Typography variant="h5">
-            <b>PLAYER STATS</b>
+    <>
+      <Loading isLoading={isLoading} />
+      <Grid xs={12} container item>
+        <Grid xs={12} item>
+          <Typography variant="h5" gutterBottom>
+            <b>TEAM STATS</b>
           </Typography>
+          {Boolean(validatedTeams.length) &&
+            validatedTeams.map((teamKey) => (
+              <DoneIcon key={teamKey} color="success" size="small" />
+            ))}
         </Grid>
-        <Grid xs={2} item>
-          <Button color="primary" variant="contained" onClick={addPlayer}>
-            ADD
+        {!validatedTeams.includes(1) && (
+          <TeamCard
+            teamData={firstTeamData}
+            teamKey={1}
+            onChange={updateTeamData}
+            updateValidatedTeam={updateValidatedTeam}
+          />
+        )}
+        {!validatedTeams.includes(2) && (
+          <TeamCard
+            teamData={secondTeamData}
+            teamKey={2}
+            onChange={updateTeamData}
+            updateValidatedTeam={updateValidatedTeam}
+          />
+        )}
+        <Grid xs={12} alignItems="center" container item>
+          <Grid xs={2} item>
+            <Typography variant="h5">
+              <b>PLAYER STATS</b>
+            </Typography>
+          </Grid>
+          <Grid xs={2} item>
+            <Button color="primary" variant="contained" onClick={addPlayer}>
+              ADD
+            </Button>
+          </Grid>
+        </Grid>
+        {Boolean(Object.keys(playerList).length) &&
+          Object.keys(playerList).map((player) => {
+            if (!validatedPlayers.includes(player)) {
+              return (
+                <StatCard
+                  key={player}
+                  player={player}
+                  data={playerList[player]}
+                  onChange={updatePlayerValue}
+                  removePlayer={removePlayer}
+                  updateValidatedPlayer={updateValidatedPlayer}
+                />
+              );
+            }
+            return (
+              <Grid key={player} xs item>
+                <Typography sx={{ padding: 1 }}>
+                  {playerList[player].name}{' '}
+                  <DoneIcon sx={{ padding: 1 }} color="success" size="small" />
+                </Typography>
+              </Grid>
+            );
+          })}
+        <Grid xs={12} item>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={handleStatUpload}
+            // TODO Improve error handling here? If stats seem unrealistic or have too many characters...
+            disabled={Object.keys(playerList).length !== 10}>
+            UPLOAD STATS
           </Button>
         </Grid>
       </Grid>
-      {Boolean(Object.keys(playerList).length) &&
-        Object.keys(playerList).map((player) => {
-          if (!validatedPlayers.includes(player)) {
-            return (
-              <StatCard
-                key={player}
-                player={player}
-                data={playerList[player]}
-                onChange={updatePlayerValue}
-                removePlayer={removePlayer}
-                updateValidatedPlayer={updateValidatedPlayer}
-              />
-            );
-          }
-          return (
-            <Grid key={player} xs item>
-              <Typography sx={{ padding: 1 }}>
-                {playerList[player].name}{' '}
-                <DoneIcon sx={{ padding: 1 }} color="success" size="small" />
-              </Typography>
-            </Grid>
-          );
-        })}
-      <Grid xs={12} item>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={handleStatUpload}
-          // TODO Improve error handling here? If stats seem unrealistic or have too many characters...
-          disabled={Object.keys(playerList).length !== 10}>
-          UPLOAD STATS
-        </Button>
-      </Grid>
-    </Grid>
+    </>
   );
 }
 
