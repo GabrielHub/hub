@@ -5,7 +5,7 @@ import { FIREBASE_BASE_URL } from 'constants';
 /**
  * @description uploads raw data. Rest endpoint will calculate stats and upload game data
  * @param {*} rawPlayerData array of raw player data
- * @param {*} rawTeamData object with keys 1 and 2 corresponding to tema data
+ * @param {*} rawTeamData object with keys 1 and 2 corresponding to team data
  * @returns Uploaded player data and the team data used to calculate stats
  */
 export const uploadRawStats = async (rawPlayerData, rawTeamData) => {

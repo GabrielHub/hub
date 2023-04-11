@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { useSnackbar } from 'notistack';
 import { Grid } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { streamTopOffensivePlayers } from 'services';
+import { fetchTableData } from 'rest';
+
+const LIMIT = 10;
 
 export function PlayerGrid(props) {
   const { columns, defaultSortField, defaultSortType } = props;
+  const { enqueueSnackbar } = useSnackbar();
   const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [sortModel, setSortModel] = useState([
     {
       field: defaultSortField,
@@ -14,25 +19,26 @@ export function PlayerGrid(props) {
     }
   ]);
 
+  const getTableRows = useCallback(async () => {
+    setLoading(true);
+    const queryParams = {
+      sortField: sortModel[0]?.field || defaultSortField,
+      sortType: sortModel[0]?.sort || defaultSortType,
+      limit: LIMIT
+    };
+    const { data, error } = await fetchTableData(queryParams);
+    if (error) {
+      setLoading(false);
+      enqueueSnackbar('Error reading data, please try again', { variant: 'error' });
+    } else {
+      setRows(data);
+      setLoading(false);
+    }
+  }, [defaultSortField, defaultSortType, enqueueSnackbar, sortModel]);
+
   useEffect(() => {
-    const unsubscribe = () =>
-      streamTopOffensivePlayers(
-        sortModel[0]?.field || defaultSortField,
-        sortModel[0]?.sort || defaultSortType,
-        (querySnapshot) => {
-          const updatedPlayers = [];
-          querySnapshot.forEach((docSnapshot) => {
-            updatedPlayers.push({ ...docSnapshot.data(), id: docSnapshot.id });
-          });
-          setRows(updatedPlayers);
-        },
-        (error) => {
-          // eslint-disable-next-line no-console
-          console.log(JSON.stringify(error));
-        }
-      );
-    return unsubscribe;
-  }, [defaultSortField, defaultSortType, sortModel]);
+    getTableRows();
+  }, [getTableRows]);
 
   return (
     <Grid xs={12} item>
@@ -41,8 +47,9 @@ export function PlayerGrid(props) {
         columns={columns}
         sortingMode="server"
         paginationMode="server"
-        rowCount={10}
+        rowCount={LIMIT}
         onSortModelChange={(newSortModel) => setSortModel(newSortModel)}
+        loading={loading}
         autoHeight
         autoPageSize
       />
