@@ -83,7 +83,8 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
   playerData.efgPerc =
     round(100 * ((playerData.fgm + 0.5 ** playerData.threepm) / playerData.fga)) || null;
   playerData.threepAR = round(100 * (playerData.threepa / playerData.fga));
-  playerData.astToRatio = round(100 * (playerData.ast / playerData.tov));
+
+  playerData.astToRatio = round(playerData.ast / playerData.tov);
 
   // * Defensive stats (opponent efficiency)
   playerData.oFGPerc = round(100 * (playerData.oFGM / playerData.oFGA)) || null;
