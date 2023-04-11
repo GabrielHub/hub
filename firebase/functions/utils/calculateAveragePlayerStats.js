@@ -86,7 +86,7 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 0.5) =
 
   // * Defensive stats (opponent efficiency)
   playerData.oFGPerc = round(100 * (playerData.oFGM / playerData.oFGA)) || null;
-  playerData.o3PPerc = round(100 * (playerData.o3PA / playerData.o3PM)) || null;
+  playerData.o3PPerc = round(100 * (playerData.o3PM / playerData.o3PA)) || null;
   playerData.oEFGPerc =
     round(100 * ((playerData.oFGM + 0.5 ** playerData.o3PM) / playerData.oFGA)) || null;
 
