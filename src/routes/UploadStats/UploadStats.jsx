@@ -86,7 +86,11 @@ export function UploadStats() {
           </Grid>
         )}
         {Boolean(Object.keys(possiblePlayerStats).length) && (
-          <StatUploader possiblePlayers={possiblePlayerStats} teamData={teamData} />
+          <StatUploader
+            possiblePlayers={possiblePlayerStats}
+            teamData={teamData}
+            handleReset={handleReset}
+          />
         )}
       </Grid>
     </>

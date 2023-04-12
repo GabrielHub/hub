@@ -51,6 +51,9 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
     oFGM: 0
   };
 
+  // * DRtg can be NaN if the opponent took 0 fg, so skip over games where this is the case and do different division
+  const statsWithNaN = {};
+
   // * Sum the basic values (some % values are in here because they use team or opponent data)
   gameData.forEach((data) => {
     Object.keys(data).forEach((stat) => {
@@ -59,7 +62,17 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
         Object.prototype.hasOwnProperty.call(playerData, stat) &&
         !propertiesToSkip.includes(stat)
       ) {
-        playerData[stat] += data[stat];
+        // * check if number is NaN
+        if (!Number.isNaN(data[stat])) {
+          // * Normal logic for stats that have values
+          playerData[stat] += data[stat];
+        } else if (Object.prototype.hasOwnProperty.call(statsWithNaN, stat)) {
+          // * Update it with one less games to count for the averages
+          statsWithNaN[stat] -= statsWithNaN[stat];
+        } else {
+          // * Add this stat to start counting games not including NaN games
+          statsWithNaN[stat] = gameData.length - 1;
+        }
       }
     });
   });
@@ -69,7 +82,14 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
     if (!propertiesToSkip.includes(stat)) {
       // TODO figure out how to save precision
       // ? Rounding here saves a loop but also makes the Perc calculations below less precise...
-      playerData[stat] = round(playerData[stat] / gameData.length);
+
+      // * Check if stat is normal (never had a NaN value)
+      let divideFactor = gameData.length;
+      if (Object.prototype.hasOwnProperty.call(statsWithNaN, stat) && statsWithNaN[stat] > 0) {
+        // * if there aren't enough games, avoid dividing by 0 or a - number
+        divideFactor = statsWithNaN[stat];
+      }
+      playerData[stat] = round(playerData[stat] / divideFactor);
     }
   });
 

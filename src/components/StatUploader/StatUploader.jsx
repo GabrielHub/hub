@@ -10,7 +10,7 @@ import { StatCard } from './StatCard';
 import { TeamCard } from './TeamCard';
 
 export function StatUploader(props) {
-  const { possiblePlayers, teamData } = props;
+  const { possiblePlayers, teamData, handleReset } = props;
   const { enqueueSnackbar } = useSnackbar();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -101,10 +101,12 @@ export function StatUploader(props) {
     // TODO better Error handling (it's very likely invalid data is inputted and incorrect values will return an error
     if (error || !data) {
       enqueueSnackbar('Error uploading data, please try again', { variant: 'error' });
+      setIsLoading(false);
     } else {
       enqueueSnackbar('Successfully uploaded data', { variant: 'success' });
+      setIsLoading(false);
+      handleReset();
     }
-    setIsLoading(false);
   };
 
   return (
@@ -192,7 +194,8 @@ StatUploader.propTypes = {
   ).isRequired,
   teamData: PropTypes.objectOf(
     PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number]))
-  ).isRequired
+  ).isRequired,
+  handleReset: PropTypes.func.isRequired
 };
 
 export default {};
