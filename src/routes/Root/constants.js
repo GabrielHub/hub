@@ -43,13 +43,7 @@ export const OFFENSIVE_PLAYERS_COLUMNS = [
   },
   {
     field: 'ast',
-    headerName: 'REB',
-    type: 'number',
-    flex: 1
-  },
-  {
-    field: 'ftm',
-    headerName: 'FT',
+    headerName: 'AST',
     type: 'number',
     flex: 1
   },
@@ -80,16 +74,6 @@ export const OFFENSIVE_PLAYERS_COLUMNS = [
     type: 'number',
     flex: 1
   },
-  /*   {
-      field: 'fgPerc',
-      headerName: 'FG%',
-      flex: 1
-    },
-    {
-      field: 'threePerc',
-      headerName: '3P%',
-      flex: 1
-    }, */
   {
     field: 'efgPerc',
     headerName: 'EFG%',
@@ -133,7 +117,6 @@ export const DEFENSIVE_PLAYERS_COLUMNS = [
     headerName: 'Name',
     width: 150,
     sortable: false
-    // editable: true
   },
   {
     field: 'gp',
@@ -164,7 +147,7 @@ export const DEFENSIVE_PLAYERS_COLUMNS = [
   },
   {
     field: 'ast',
-    headerName: 'REB',
+    headerName: 'AST',
     type: 'number',
     flex: 1
   },
@@ -177,6 +160,12 @@ export const DEFENSIVE_PLAYERS_COLUMNS = [
   {
     field: 'blk',
     headerName: 'BLK',
+    type: 'number',
+    flex: 1
+  },
+  {
+    field: 'pf',
+    headerName: 'FOUL',
     type: 'number',
     flex: 1
   },

@@ -32,20 +32,18 @@ const upsertPlayerData = async (snapshot) => {
       }
     });
 
-    // * If player does not exist, create it and use data as averages.
+    // * If player does not exist, create it.
     const playerQuerySnapshot = await db
       .collection('players')
       .where('alias', 'array-contains', name)
       .get();
 
-    // * Requery for all game data and overwrite playerdata to fix data errors and essentially resync data
+    // * Query for all game data and overwrite player data to fix data errors and essentially resync data
     if (playerQuerySnapshot.empty) {
-      const gameDataRef = await db.collection('games').where('name', '==', name).get();
-      const gameData = gameDataRef.docs.map((doc) => doc.data());
-
-      const avgPlayerStats = calculateAveragePlayerStats(gameData, name);
       await db.collection('players').add({
-        ...avgPlayerStats,
+        name,
+        alias: [name],
+        ftPerc: 70,
         _createdAt: admin.firestore.Timestamp.now(),
         _updatedAt: admin.firestore.Timestamp.now()
       });
@@ -53,26 +51,27 @@ const upsertPlayerData = async (snapshot) => {
       // * collect all games by ALIAS includes NAME and use that for the calculate function
       // * There could theoretically be bad data, and an alias could be in multiple players. Avoid this by taking the first
       // TODO Error notifications/logs if there are more than one unique alias in someone's aliases?
-      // * This should always return valid data
       const playerData = playerQuerySnapshot.docs.map((doc) => {
         return { ...doc.data(), id: doc.id };
       })[0];
 
       const { name: storedName, alias, ftPerc, id } = playerData;
 
+      // * Only calculate averages once a player has at least 5 games
       const gameDataRef = await db.collection('games').where('name', 'in', alias).get();
-      const gameData = gameDataRef.docs.map((doc) => doc.data());
+      if (gameDataRef.size >= 5) {
+        const gameData = gameDataRef.docs.map((doc) => doc.data());
+        const avgPlayerStats = calculateAveragePlayerStats(gameData, storedName, alias, ftPerc);
 
-      const avgPlayerStats = calculateAveragePlayerStats(gameData, storedName, alias, ftPerc);
-
-      await db
-        .collection('players')
-        .doc(id)
-        .set({
-          ...avgPlayerStats,
-          _createdAt: admin.firestore.Timestamp.now(),
-          _updatedAt: admin.firestore.Timestamp.now()
-        });
+        await db
+          .collection('players')
+          .doc(id)
+          .set({
+            ...avgPlayerStats,
+            _createdAt: admin.firestore.Timestamp.now(),
+            _updatedAt: admin.firestore.Timestamp.now()
+          });
+      }
     }
 
     gameRef.update({

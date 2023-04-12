@@ -28,7 +28,7 @@ export function Root() {
       <Grid xs container item>
         <Grid xs={12} item>
           <Typography variant="h5" gutterBottom>
-            Players Ranked By Offense
+            Players Ranked By Offense (min 5 games)
           </Typography>
         </Grid>
         <PlayerGrid
@@ -40,7 +40,7 @@ export function Root() {
       <Grid xs container item>
         <Grid xs={12} item>
           <Typography variant="h5" gutterBottom>
-            Players Ranked By Defense
+            Players Ranked By Defense (min 5 games)
           </Typography>
         </Grid>
         <PlayerGrid

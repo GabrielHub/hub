@@ -2,16 +2,15 @@ const admin = require('firebase-admin');
 
 // * Fetches players for table
 const fetchForTable = async (req, res) => {
-  const { sortField, sortType, limit = 10, minGames = 1 } = req.body;
+  const { sortField, sortType, limit } = req.body;
 
   const db = admin.firestore();
   const playerData = [];
 
   await db
     .collection('players')
-    .where('gp', '>', minGames)
     .orderBy(sortField, sortType)
-    .limit(limit)
+    .limit(limit ?? 10)
     .get()
     .then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
