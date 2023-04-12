@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography } from '@mui/material';
+import { Grid, Link, Typography } from '@mui/material';
 import { PlayerGrid } from 'components/PlayerGrid';
 import {
   DEFENSIVE_PLAYERS_COLUMNS,
@@ -22,6 +22,20 @@ export function Root() {
             Effortlessly browse through a wealth of statistics, organized in a sleek and visually
             captivating format. Use performance metrics, advanced analytics, and player data to
             unlock insights and trends.
+          </Typography>
+        </Grid>
+        <Grid xs={12} item>
+          <Typography variant="body2" gutterBottom>
+            This is an open source project built with React, Firebase, Express and Node. Report bugs
+            and view updates{' '}
+            <Link
+              href="https://github.com/GabrielHub/hub"
+              target="_blank"
+              rel="noreferrer"
+              variant="body2"
+              underline="none">
+              here!
+            </Link>
           </Typography>
         </Grid>
       </Grid>
