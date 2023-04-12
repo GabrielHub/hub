@@ -4,7 +4,7 @@ import { Root } from './Root';
 import { ImageCarousel } from './ImageCarousel';
 import { GM } from './GM';
 import { UploadStats } from './UploadStats';
-import { Players } from './Players';
+import { Players, PlayerData } from './Players';
 
 export const routerConfig = [
   {
@@ -26,10 +26,14 @@ export const routerConfig = [
         path: '/hub/gm',
         element: <GM />
       },
-      // * 2K Stat Uploader
+      // * 2K Stat Hub
       {
         path: '/hub/players',
         element: <Players />
+      },
+      {
+        path: '/hub/players/:playerID',
+        element: <PlayerData />
       },
       {
         path: '/hub/upload',

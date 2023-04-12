@@ -9,7 +9,7 @@ const fetchGM = require('../rest/fetchGM');
  * @description function to fetch lookups and set them in firestore database
  * @param {*} req
  * @param {*} res
- * @returns {*} Obect of document written to firestore
+ * @returns {*} Object of document written to firestore
  */
 const storeGM = async (req, res) => {
   const { username } = req.body;
