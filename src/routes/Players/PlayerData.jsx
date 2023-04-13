@@ -1,10 +1,12 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { Grid, Typography } from '@mui/material';
+import { Grid, IconButton, Typography } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 import { fetchPlayerData } from 'rest';
 import { Loading } from 'components/Loading';
 import { THEME_COLORS } from 'constants';
+import { EditPlayerModal } from 'components/Modal';
 import {
   PLAYER_AVERAGES_DEFENSE,
   PLAYER_AVERAGES_MISC,
@@ -22,8 +24,13 @@ export function PlayerData() {
   const { playerID } = useParams();
   const { enqueueSnackbar } = useSnackbar();
 
+  const [isOpen, setIsOpen] = useState(false);
   const [playerData, setPlayerData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleModalClose = () => {
+    setIsOpen(false);
+  };
 
   const getPlayerData = useCallback(async () => {
     setIsLoading(true);
@@ -47,6 +54,15 @@ export function PlayerData() {
     <>
       <Loading isLoading={isLoading} />
       {playerData && (
+        <EditPlayerModal
+          open={isOpen}
+          handleClose={handleModalClose}
+          ftPerc={playerData?.ftPerc}
+          alias={playerData?.alias}
+        />
+      )}
+
+      {playerData && (
         <Grid sx={{ padding: 1 }} justifyContent="center" container>
           <Grid xs={10} sx={{ marginBottom: 16 }} container item>
             <Grid
@@ -62,7 +78,13 @@ export function PlayerData() {
               item
               container>
               <Grid xs md={8} item>
-                <Typography align="center" variant="h3">
+                <Typography
+                  align="center"
+                  variant="h3"
+                  sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <IconButton onClick={() => setIsOpen(true)} size="large">
+                    <EditIcon />
+                  </IconButton>
                   {playerData.name}
                 </Typography>
               </Grid>
