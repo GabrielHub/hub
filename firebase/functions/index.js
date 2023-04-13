@@ -3,6 +3,7 @@ const admin = require('firebase-admin');
 const cors = require('cors');
 const express = require('express');
 
+// * Rest functions
 const storeGM = require('./api/lookup');
 const getPopularity = require('./api/popularity');
 const uploadStats = require('./api/upload');
@@ -10,7 +11,11 @@ const fetchForTable = require('./api/fetchForTable');
 const testFirebaseStuff = require('./api/testFirebaseStuff');
 const fetchPlayerData = require('./api/fetchPlayerData');
 
+// * Cloud triggers
 const upsertPlayerData = require('./api/triggers/games');
+
+// * Cron jobs
+const deleteDuplicateGames = require('./api/scheduled/deleteDuplicateGames');
 
 admin.initializeApp();
 
@@ -39,3 +44,7 @@ exports.app = functions.https.onRequest(app);
 
 // * Cloud Triggers
 exports.upsertPlayerData = functions.firestore.document('games/{gameId}').onWrite(upsertPlayerData);
+exports.deleteDuplicateGames = functions.pubsub
+  .schedule('0 23 * * *')
+  .timeZone('America/New_York')
+  .onRun(deleteDuplicateGames);

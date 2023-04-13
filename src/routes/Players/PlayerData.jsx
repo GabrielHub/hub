@@ -15,6 +15,7 @@ import {
 // TODO Career Highs
 // TODO Last 5 games played
 // TODO Rankings for offense and defense
+// * for ranking https://stackoverflow.com/questions/74087802/finding-index-of-a-firestore-document-for-a-given-query
 // TODO Player Comparison Table
 
 export function PlayerData() {
