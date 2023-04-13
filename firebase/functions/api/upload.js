@@ -6,6 +6,7 @@ const calculateFreeThrowsMade = require('../utils/calculateFreeThrows');
 const calculateDoubles = require('../utils/calculateDoubles');
 const calculateAdvancedOffensiveStats = require('../utils/calculateAdvancedOffensiveStats');
 const calculateAdvancedDefensiveStats = require('../utils/calculateAdvancedDefensiveStats');
+const constants = require('../constants');
 
 // TODO Error handling. if values return null we should error instead of saving invalid data
 
@@ -35,7 +36,11 @@ const uploadStats = async (req, res) => {
   // * Combined stats of each player on each team should add up to respective rawTeamData
   // * Must be a unique position for each player ( 1 - 5 ) to match opposing players
 
-  const { rawTeamData, rawPlayerData } = req.body;
+  const { rawTeamData, rawPlayerData, key } = req.body;
+
+  if (!key || typeof key !== 'string' || key !== constants.UPLOAD_KEY) {
+    throw Error('Invalid request parameters');
+  }
 
   const formattedTeamData = {};
   const teamReboundData = {};

@@ -107,6 +107,8 @@ export const handleUploadValidation = (rawPlayerData, rawTeamData) => {
   Object.keys(rawTeamData[teamKeys[0]]).forEach((stat) => {
     if (
       !playerPropsToSkip.includes(stat) &&
+      // * TOV are an exception... there can be team turnovers such as 3 second calls
+      stat !== 'tov' &&
       teamOnePlayerSum?.[stat] &&
       // eslint-disable-next-line eqeqeq
       teamOnePlayerSum[stat] != rawTeamData[teamKeys[0]][stat]
@@ -118,6 +120,8 @@ export const handleUploadValidation = (rawPlayerData, rawTeamData) => {
   Object.keys(rawTeamData[teamKeys[1]]).forEach((stat) => {
     if (
       !playerPropsToSkip.includes(stat) &&
+      // * TOV are an exception... there can be team turnovers such as 3 second calls
+      stat !== 'tov' &&
       teamTwoPlayerSum?.[stat] &&
       // eslint-disable-next-line eqeqeq
       teamTwoPlayerSum[stat] != rawTeamData[teamKeys[1]][stat]

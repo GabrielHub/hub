@@ -12,7 +12,7 @@ import { TeamCard } from './TeamCard';
 import { handleUploadValidation } from './utils';
 
 export function StatUploader(props) {
-  const { possiblePlayers, teamData, handleReset } = props;
+  const { possiblePlayers, teamData, handleReset, uploadKey } = props;
   const { enqueueSnackbar } = useSnackbar();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -114,7 +114,7 @@ export function StatUploader(props) {
       return;
     }
 
-    const { data, error } = await uploadRawStats(rawPlayerData, rawTeamData);
+    const { data, error } = await uploadRawStats(rawPlayerData, rawTeamData, uploadKey);
     if (error || !data) {
       enqueueSnackbar('Error uploading data, please try again', { variant: 'error' });
       setIsLoading(false);
@@ -199,12 +199,11 @@ export function StatUploader(props) {
             </Grid>
           );
         })}
-      <Grid xs={12} item>
+      <Grid xs={12} justifyContent="center" container item>
         <Button
           color="primary"
           variant="contained"
           onClick={handleStatUpload}
-          // TODO Improve error handling here? If stats seem unrealistic or have too many characters...
           disabled={Object.keys(playerList).length !== 10}>
           UPLOAD STATS
         </Button>
@@ -220,7 +219,12 @@ StatUploader.propTypes = {
   teamData: PropTypes.objectOf(
     PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number]))
   ).isRequired,
-  handleReset: PropTypes.func.isRequired
+  handleReset: PropTypes.func.isRequired,
+  uploadKey: PropTypes.string
+};
+
+StatUploader.defaultProps = {
+  uploadKey: ''
 };
 
 export default {};

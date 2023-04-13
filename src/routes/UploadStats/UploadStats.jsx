@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Grid, Button, Typography } from '@mui/material';
+import { Grid, Button, Typography, TextField } from '@mui/material';
 import Tesseract from 'tesseract.js';
 import { parsePossiblePlayerData, parseTeamTotalData, removeSpecialCharacters } from 'utils';
 import { StatUploader } from 'components/StatUploader';
@@ -13,6 +13,7 @@ export function UploadStats() {
   const [isLoading, setIsLoading] = useState(false);
   const [hideRules, setHideRules] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [uploadKey, setUploadKey] = useState('');
 
   const convertImageToText = useCallback(async () => {
     Tesseract.recognize(imageData, 'eng', {
@@ -100,23 +101,29 @@ export function UploadStats() {
           </Grid>
         )}
 
-        <Grid xs={12} justifyContent="center" container item>
-          <Grid xs={3} justifyContent="center" container item sx={{ margin: 1 }}>
+        <Grid xs={12} justifyContent="center" alignItems="center" container item>
+          <Grid xs={3} justifyContent="center" container item>
+            <TextField
+              placeholder="Upload key"
+              onChange={(e) => setUploadKey(e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid xs={3} justifyContent="center" container item>
             <Button variant="contained" onClick={() => setHideRules(!hideRules)}>
               Show/Hide Upload Rules
             </Button>
           </Grid>
           {!imageData && (
-            <Grid xs={3} justifyContent="center" container item sx={{ margin: 1 }}>
+            <Grid xs={2} justifyContent="center" container item>
               <Button variant="contained" component="label">
                 Upload Image{' '}
                 <input hidden accept="image/*" type="file" onClick={handleImageChange} />
               </Button>
             </Grid>
           )}
-
           {Boolean(imageData) && (
-            <Grid xs={3} justifyContent="center" container item sx={{ margin: 1 }}>
+            <Grid xs={1} justifyContent="center" container item>
               <Button variant="contained" component="label" color="error" onClick={handleReset}>
                 RESET
               </Button>
@@ -141,6 +148,7 @@ export function UploadStats() {
         )}
         {Boolean(Object.keys(possiblePlayerStats).length) && (
           <StatUploader
+            uploadKey={uploadKey}
             possiblePlayers={possiblePlayerStats}
             teamData={teamData}
             handleReset={handleReset}

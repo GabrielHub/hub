@@ -6,6 +6,10 @@ const navConfig = [
   {
     title: 'Players',
     path: '/hub/players'
+  },
+  {
+    title: 'Upload Data',
+    path: '/hub/upload'
   }
 ];
 
