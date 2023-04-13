@@ -39,4 +39,13 @@ export const PLAYER_STAT_READABLE = {
   threepa: '3PA'
 };
 
+export const THEME_COLORS = {
+  PRIMARY: '#004e9a',
+  SECONDARY: '#ea4493',
+  PRIMARY_LIGHT: '#418cd4',
+  SECONDARY_LIGHT: '#ff9cdb',
+  LIGHT: '#fffbec',
+  DARK: '#051b2c'
+};
+
 export default {};

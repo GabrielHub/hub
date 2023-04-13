@@ -164,4 +164,219 @@ export const RECENT_PLAYERS_DEFAULT_SORTS = {
   type: 'desc'
 };
 
+// * For Offense Stat Box
+export const PLAYER_AVERAGES_OFFENSE = [
+  {
+    field: 'usageRate',
+    header: 'USG%',
+    size: 4,
+    tooltip: false
+  },
+  {
+    field: 'ortg',
+    header: 'Offensive Rating',
+    size: 4,
+    tooltip: false
+  },
+  {
+    field: 'gameScore',
+    header: 'Game Score',
+    size: 4,
+    tooltip: false
+  },
+  {
+    field: 'pts',
+    header: 'PTS',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'treb',
+    header: 'REB',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'ast',
+    header: 'AST',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'tov',
+    header: 'TO',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'fgPerc',
+    header: 'FG%',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'threePerc',
+    header: '3P%',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'efgPerc',
+    header: 'EFG%',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'tsPerc',
+    header: 'TS%',
+    size: 3,
+    tooltip: false
+  }
+];
+
+// * For Offense Stat Box
+export const PLAYER_AVERAGES_DEFENSE = [
+  {
+    field: 'drtg',
+    header: 'Defensive Rating',
+    size: 12,
+    tooltip: false
+  },
+  {
+    field: 'stl',
+    header: 'STL',
+    size: 4,
+    tooltip: false
+  },
+  {
+    field: 'blk',
+    header: 'BLK',
+    size: 4,
+    tooltip: false
+  },
+  {
+    field: 'pf',
+    header: 'FOULS',
+    size: 4,
+    tooltip: false
+  },
+  {
+    field: 'oFGPerc',
+    header: 'oFG%',
+    size: 4,
+    tooltip: false
+  },
+  {
+    field: 'o3PPerc',
+    header: 'o3P%',
+    size: 4,
+    tooltip: false
+  },
+  {
+    field: 'oEFGPerc',
+    header: 'oEFG%',
+    size: 4,
+    tooltip: false
+  }
+];
+
+export const PLAYER_AVERAGES_MISC = [
+  {
+    field: 'dd',
+    header: 'Double Doubles',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'td',
+    header: 'Triple Doubles',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'qd',
+    header: 'Quadruple Doubles',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'threepAR',
+    header: '3pt Attempt Rate',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'fgm',
+    header: 'FGM',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'fga',
+    header: 'FGA',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'threepm',
+    header: '3PM',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'threepa',
+    header: '3PA',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'oFGM',
+    header: 'oFGM',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'oFGA',
+    header: 'oFGA',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'o3PM',
+    header: 'o3PM',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'o3PA',
+    header: 'o3PA',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'twopm',
+    header: '2PM',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'twopa',
+    header: '2PA',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'fta',
+    header: 'FTA',
+    size: 3,
+    tooltip: false
+  },
+  {
+    field: 'ftm',
+    header: 'FTM',
+    size: 3,
+    tooltip: false
+  }
+];
+
 export default {};
