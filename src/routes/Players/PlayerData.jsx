@@ -91,7 +91,7 @@ export function PlayerData() {
           <Grid xs={12} item />
 
           {/* TABLE FOR OFFENSIVE BASIC STATS */}
-          <Grid xs sx={{ margin: 4 }} container item>
+          <Grid xs={12} sm={6} md sx={{ margin: 4 }} container item>
             <Grid
               sx={{
                 borderRadius: 10,
@@ -124,7 +124,7 @@ export function PlayerData() {
           </Grid>
 
           {/* TABLE FOR DEFENSIVE BASIC STATS */}
-          <Grid xs sx={{ margin: 4 }} container item>
+          <Grid xs={12} sm={6} md sx={{ margin: 4 }} container item>
             <Grid
               sx={{
                 borderRadius: 10,
@@ -157,7 +157,7 @@ export function PlayerData() {
           </Grid>
 
           {/* TABLE FOR MISC BASIC STATS */}
-          <Grid xs={12} sx={{ margin: 4 }} container item>
+          <Grid xs={12} md sx={{ margin: 4 }} container item>
             <Grid
               sx={{
                 borderRadius: 10,
@@ -173,7 +173,7 @@ export function PlayerData() {
               container>
               <Grid xs={12} sx={{ paddingBottom: 4 }} item>
                 <Typography align="center" variant="h5" gutterBottom>
-                  <b>Player Averages - Offense</b>
+                  <b>Extra Stats</b>
                 </Typography>
               </Grid>
               {PLAYER_AVERAGES_MISC.map((stat) => (

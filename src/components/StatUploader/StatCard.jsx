@@ -16,13 +16,13 @@ export function StatCard(props) {
 
   return (
     <Grid sx={{ padding: 2 }} xs={12} container item>
-      <Grid xs item>
+      <Grid xs alignItems="center" container item>
         <IconButton aria-label="done" onClick={() => updateValidatedPlayer(player)}>
           <DoneIcon color="success" size="small" />
         </IconButton>
       </Grid>
       {Object.keys(data).map((dataKey) => (
-        <Grid key={dataKey} xs item>
+        <Grid key={dataKey} sx={{ padding: 1 }} xs item>
           <TextField
             variant="outlined"
             name={dataKey}
@@ -32,7 +32,7 @@ export function StatCard(props) {
           />
         </Grid>
       ))}
-      <Grid xs item>
+      <Grid xs alignItems="center" item container>
         <IconButton aria-label="delete" onClick={() => removePlayer(player)}>
           <DeleteIcon color="error" size="small" />
         </IconButton>

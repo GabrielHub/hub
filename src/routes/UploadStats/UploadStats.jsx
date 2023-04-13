@@ -11,6 +11,7 @@ export function UploadStats() {
   const [imageData, setImageData] = useState(null);
   const [confidence, setConfidence] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [hideRules, setHideRules] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const convertImageToText = useCallback(async () => {
@@ -56,27 +57,80 @@ export function UploadStats() {
   return (
     <>
       <Loading isLoading={isLoading} />
-      <Grid sx={{ padding: 1 }} container>
-        <Grid xs={8} item>
-          <Typography variant="h4" gutterBottom>
-            Upload a screenshot of a Rec/Pro-Am game
+      <Grid container>
+        <Grid xs={12} item>
+          <Typography align="center" variant="h4">
+            Upload a screenshot of a Rec/Pro-Am Game to add stats
           </Typography>
         </Grid>
-        <Grid xs={2} item>
-          <Button variant="contained" component="label">
-            Upload Image <input hidden accept="image/*" type="file" onClick={handleImageChange} />
-          </Button>
-        </Grid>
-        {Boolean(imageData) && (
-          <Grid xs={2} item>
-            <Button variant="contained" component="label" color="error" onClick={handleReset}>
-              RESET
-            </Button>
+        {!hideRules && (
+          <Grid xs={12} justifyContent="center" container item>
+            <Grid xs={12} justifyContent="center" container item>
+              <Typography variant="caption" sx={{ color: 'grey' }} gutterBottom>
+                *Stats are uploaded on an honor system, please do not upload broken or imaginary
+                data
+              </Typography>
+            </Grid>
+            <Grid xs={12} justifyContent="center" container item>
+              <Typography variant="caption" sx={{ color: 'grey' }} gutterBottom>
+                Try not to have multiple players of the same name
+              </Typography>
+            </Grid>
+            <Grid xs={12} justifyContent="center" container item>
+              <Typography variant="caption" sx={{ color: 'grey' }} gutterBottom>
+                Players on a team must have a unique position (1 - 5) and their opponent should have
+                a matching position
+              </Typography>
+            </Grid>
+            <Grid xs={12} justifyContent="center" container item>
+              <Typography variant="caption" sx={{ color: 'grey' }} gutterBottom>
+                ex. Player&apos;s name is AI Player, make their name AI Player or Al Player
+              </Typography>
+            </Grid>
+            <Grid xs={12} justifyContent="center" container item>
+              <Typography variant="caption" sx={{ color: 'grey' }} gutterBottom>
+                ex. Player&apos;s name is [][][][], make their name Boxes
+              </Typography>
+            </Grid>
+            <Grid xs={12} justifyContent="center" container item>
+              <Typography variant="caption" sx={{ color: 'grey' }} gutterBottom>
+                ex. Player&apos;s name is [][]Lebron[]James[], make their name Lebron James
+              </Typography>
+            </Grid>
           </Grid>
         )}
+
+        <Grid xs={12} justifyContent="center" container item>
+          <Grid xs={3} justifyContent="center" container item sx={{ margin: 1 }}>
+            <Button variant="contained" onClick={() => setHideRules(!hideRules)}>
+              Show/Hide Upload Rules
+            </Button>
+          </Grid>
+          {!imageData && (
+            <Grid xs={3} justifyContent="center" container item sx={{ margin: 1 }}>
+              <Button variant="contained" component="label">
+                Upload Image{' '}
+                <input hidden accept="image/*" type="file" onClick={handleImageChange} />
+              </Button>
+            </Grid>
+          )}
+
+          {Boolean(imageData) && (
+            <Grid xs={3} justifyContent="center" container item sx={{ margin: 1 }}>
+              <Button variant="contained" component="label" color="error" onClick={handleReset}>
+                RESET
+              </Button>
+            </Grid>
+          )}
+        </Grid>
+
         {Boolean(imageData) && (
-          <Grid container item>
-            <img style={{ width: '50vw', margin: 'auto' }} src={imageData} alt="uploaded" />
+          <Grid xs={12} sx={{ marginBottom: 4 }} container item>
+            <img
+              style={{ width: '50vw', margin: 'auto', borderRadius: 15 }}
+              src={imageData}
+              alt="uploaded"
+            />
             {Boolean(progress) && <Typography>Recognizing Image: {progress}%</Typography>}
             {Boolean(confidence) && (
               <Typography gutterBottom>

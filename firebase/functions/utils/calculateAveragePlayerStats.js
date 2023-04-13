@@ -77,9 +77,12 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
     });
   });
 
+  // * Properties to total and not average
+  const propertiesToTotal = ['dd', 'td', 'qd'];
+
   // * Average values by number of games and round them
   Object.keys(playerData).forEach((stat) => {
-    if (!propertiesToSkip.includes(stat)) {
+    if (!propertiesToSkip.includes(stat) && !propertiesToTotal.includes(stat)) {
       // TODO figure out how to save precision
       // ? Rounding here saves a loop but also makes the Perc calculations below less precise...
 

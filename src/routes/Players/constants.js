@@ -283,25 +283,25 @@ export const PLAYER_AVERAGES_DEFENSE = [
 export const PLAYER_AVERAGES_MISC = [
   {
     field: 'dd',
-    header: 'Double Doubles',
+    header: 'DD',
     size: 3,
     tooltip: false
   },
   {
     field: 'td',
-    header: 'Triple Doubles',
+    header: 'TD',
     size: 3,
     tooltip: false
   },
   {
     field: 'qd',
-    header: 'Quadruple Doubles',
+    header: 'QD',
     size: 3,
     tooltip: false
   },
   {
     field: 'threepAR',
-    header: '3pt Attempt Rate',
+    header: '3P Attempt Rate',
     size: 3,
     tooltip: false
   },

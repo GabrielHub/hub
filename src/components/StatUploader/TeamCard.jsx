@@ -14,13 +14,13 @@ export function TeamCard(props) {
 
   return (
     <Grid sx={{ padding: 2 }} xs={12} container item>
-      <Grid xs item>
+      <Grid alignItems="center" xs container item>
         <IconButton aria-label="done" onClick={() => updateValidatedTeam(teamKey)}>
           <DoneIcon color="success" size="small" />
         </IconButton>
       </Grid>
       {Object.keys(teamData).map((dataKey) => (
-        <Grid key={dataKey} xs item>
+        <Grid key={dataKey} sx={{ padding: 1 }} xs item>
           <TextField
             variant="outlined"
             name={dataKey}

@@ -44,7 +44,7 @@ export const THEME_COLORS = {
   SECONDARY: '#ea4493',
   PRIMARY_LIGHT: '#418cd4',
   SECONDARY_LIGHT: '#ff9cdb',
-  LIGHT: '#fffbec',
+  LIGHT: '#feffec',
   DARK: '#051b2c'
 };
 
