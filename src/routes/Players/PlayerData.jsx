@@ -48,7 +48,7 @@ export function PlayerData() {
       <Loading isLoading={isLoading} />
       {playerData && (
         <Grid sx={{ padding: 1 }} justifyContent="center" container>
-          <Grid xs={8} sx={{ marginBottom: 16 }} container item>
+          <Grid xs={10} sx={{ marginBottom: 16 }} container item>
             <Grid
               sx={{
                 borderRadius: 25,
@@ -61,18 +61,18 @@ export function PlayerData() {
               xs
               item
               container>
-              <Grid xs={8} item>
+              <Grid xs md={8} item>
                 <Typography align="center" variant="h3">
                   {playerData.name}
                 </Typography>
               </Grid>
               <Grid xs justifyContent="flex-end" alignItems="center" container item>
-                <Grid xs={3} item>
+                <Grid xs md={3} item>
                   <Typography>
                     <b>GP:</b> {playerData.gp}
                   </Typography>
                 </Grid>
-                <Grid xs={4} item>
+                <Grid xs md={4} item>
                   <Typography>
                     <b>FT%:</b> {playerData.ftPerc}
                   </Typography>
@@ -158,7 +158,7 @@ export function PlayerData() {
           </Grid>
 
           {/* TABLE FOR MISC BASIC STATS */}
-          <Grid xs={12} md sx={{ margin: 4 }} container item>
+          <Grid xs={12} md={12} sx={{ margin: 4 }} container item>
             <Grid
               sx={{
                 borderRadius: 10,

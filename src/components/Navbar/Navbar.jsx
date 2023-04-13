@@ -9,15 +9,15 @@ export function Navbar() {
   return (
     <>
       <Grid alignItems="center" sx={{ paddingBottom: 4 }} container>
-        <Grid xs={2} sx={{ padding: 2 }} item>
+        <Grid xs md={2} sx={{ padding: 2 }} item>
           <Typography variant="h4" sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
             <img src={logo512} alt="Logo" style={{ width: 50 }} />
             Hub
           </Typography>
         </Grid>
-        <Grid xs={10} justifyContent="flex-end" alignItems="center" container item>
+        <Grid xs md={10} justifyContent="flex-end" alignItems="center" container item>
           {navConfig.map((route) => (
-            <Grid xs={2} key={route.path} item>
+            <Grid xs md={2} key={route.path} item>
               <Link to={route.path} style={{ textDecoration: 'none' }}>
                 <Typography
                   variant="h6"
