@@ -18,6 +18,9 @@ const upsertPlayerData = require('./api/triggers/games');
 // * Cron jobs
 const deleteDuplicateGames = require('./api/scheduled/deleteDuplicateGames');
 
+// * webhooks
+const NanonetsWebhook = require('./api/webhook/nanonets');
+
 admin.initializeApp();
 
 const app = express();
@@ -42,6 +45,8 @@ app.get('/testFunctions', cors(corsOptionsDelegate), testFirebaseStuff);
 app.post('/queryTableData', cors(corsOptionsDelegate), fetchForTable);
 app.get('/lookupPlayer', cors(corsOptionsDelegate), fetchPlayerData);
 app.post('/updatePlayerDetails', cors(corsOptionsDelegate), updatePlayerDetails);
+// * webhook
+app.post('/nanonets/webhook', cors(corsOptionsDelegate), NanonetsWebhook);
 exports.app = functions.https.onRequest(app);
 
 // * Cloud Triggers

@@ -8,8 +8,19 @@ const navConfig = [
     path: '/hub/players'
   },
   {
-    title: 'Upload Data',
-    path: '/hub/upload'
+    title: 'Upload',
+    multi: true,
+    paths: [
+      {
+        title: 'Upload Image',
+        path: '/hub/imageUpload'
+      },
+
+      {
+        title: 'Manual',
+        path: '/hub/manualUpload'
+      }
+    ]
   }
 ];
 

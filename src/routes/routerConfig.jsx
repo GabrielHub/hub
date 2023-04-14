@@ -5,6 +5,7 @@ import { ImageCarousel } from './ImageCarousel';
 import { GM } from './GM';
 import { UploadStats } from './UploadStats';
 import { Players, PlayerData } from './Players';
+import { ImageUpload, Success } from './ImageUpload';
 
 export const routerConfig = [
   {
@@ -36,7 +37,15 @@ export const routerConfig = [
         element: <PlayerData />
       },
       {
-        path: '/hub/upload',
+        path: '/hub/imageUpload',
+        element: <ImageUpload />
+      },
+      {
+        path: '/hub/imageUpload/success',
+        element: <Success />
+      },
+      {
+        path: '/hub/manualUpload',
         element: <UploadStats />
       }
     ]
