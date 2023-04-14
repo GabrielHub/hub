@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { FIREBASE_BASE_URL } from 'constants';
 
-export const fetchPlayerData = async ({ playerID, ftPerc, alias, aliasesToAdd }) => {
+export const updatePlayerDetails = async ({ playerID, ftPerc, alias, aliasesToAdd }) => {
   const response = {};
   const body = {
     playerID,
@@ -11,7 +11,7 @@ export const fetchPlayerData = async ({ playerID, ftPerc, alias, aliasesToAdd })
   };
 
   await axios
-    .get(`${FIREBASE_BASE_URL}/updatePlayerDetails`, body)
+    .post(`${FIREBASE_BASE_URL}/updatePlayerDetails`, body)
     .then((res) => {
       response.data = res.data;
     })

@@ -55,6 +55,7 @@ export function PlayerData() {
       <Loading isLoading={isLoading} />
       {playerData && (
         <EditPlayerModal
+          setIsLoading={setIsLoading}
           open={isOpen}
           handleClose={handleModalClose}
           ftPerc={playerData?.ftPerc}

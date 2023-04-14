@@ -7,15 +7,18 @@ const updatePlayerDetails = async (req, res) => {
   // * alias is the existing alias array
   const { playerID, ftPerc, alias, aliasesToAdd } = req.body;
 
+  // * Sanitize FT format
+  const formattedFT = parseInt(ftPerc, 10);
+
   if (!playerID || typeof playerID !== 'string') {
     throw new Error('Invalid player passed');
   }
 
-  if (!ftPerc || typeof ftPerc !== 'number') {
+  if (!ftPerc || Number.isNaN(formattedFT)) {
     throw new Error('Invalid ftPerc');
   }
 
-  if (!aliasesToAdd || !aliasesToAdd.length) {
+  if (!Array.isArray(aliasesToAdd)) {
     throw new Error('Invalid aliases');
   }
 
@@ -28,37 +31,21 @@ const updatePlayerDetails = async (req, res) => {
   });
 
   const db = admin.firestore();
-  // * Make sure alias is unique
-  const existingAliasMatch = [];
 
-  await db
+  // * Make sure alias is unique
+  const querySnapshot = await db
     .collection('players')
     .where('alias', 'array-contains-any', formattedAlias)
-    .get()
-    .forEach((querySnapshot) => {
-      querySnapshot.doc((doc) => {
-        existingAliasMatch.push(doc.data()?.name);
-      });
-    });
-
-  if (existingAliasMatch.length) {
-    throw new Error(`Aliases ${existingAliasMatch.toString()} already exist`);
+    .get();
+  if (querySnapshot.size) {
+    throw new Error(`Aliases already exist`);
   }
 
   const aliasesToUpdate = [...alias, ...aliasesToAdd];
-  await db
-    .collection('players')
-    .doc(playerID)
-    .update({
-      alias: aliasesToUpdate
-    })
-    .then(() => {
-      // eslint-disable-next-line no-console
-      console.log('Successfully updated document');
-    })
-    .error((error) => {
-      throw new Error('Player does not exist', error);
-    });
+  await db.collection('players').doc(playerID).update({
+    alias: aliasesToUpdate,
+    ftPerc: formattedFT
+  });
 
   res.send(aliasesToUpdate);
 };

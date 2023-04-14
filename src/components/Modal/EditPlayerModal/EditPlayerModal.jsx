@@ -8,23 +8,23 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import updatePlayerDetails from 'rest/firestore/updatePlayerDetails';
+import { updatePlayerDetails } from 'rest';
 
 export function EditPlayerModal(props) {
   const { open, handleClose, playerID, ftPerc, alias, setIsLoading } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [ftPercField, setFTPercField] = useState(ftPerc);
   // * Aliases are separated  by commas
-  const [aliasField, setAliasField] = useState(alias.toString());
+  const [aliasField, setAliasField] = useState('');
 
   const handleUpdate = async () => {
     setIsLoading(true);
 
     const params = {
       playerID,
-      ftPerc,
+      ftPerc: parseInt(ftPercField, 10),
       alias,
-      aliasesToAdd: aliasField
+      aliasesToAdd: aliasField.split(',')
     };
     const { data, error } = await updatePlayerDetails(params);
     if (!data || error) {
@@ -61,8 +61,8 @@ export function EditPlayerModal(props) {
           value={aliasField}
           onChange={(e) => setAliasField(e.target.value)}
           margin="dense"
-          label="FT%"
-          placeHolder="name1,name2..."
+          label="Aliases"
+          placeholder="name1,name2..."
           helperText="Add extra aliases here"
           fullWidth
           variant="standard"

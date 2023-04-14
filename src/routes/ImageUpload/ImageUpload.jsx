@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 export function ImageUpload() {
   const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate;
+  const navigate = useNavigate();
   const [imageData, setImageData] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
