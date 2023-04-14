@@ -59,6 +59,7 @@ export function PlayerData() {
           handleClose={handleModalClose}
           ftPerc={playerData?.ftPerc}
           alias={playerData?.alias}
+          playerID={playerID}
         />
       )}
 

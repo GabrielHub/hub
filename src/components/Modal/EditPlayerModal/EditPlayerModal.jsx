@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useSnackbar } from 'notistack';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -7,15 +8,32 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import updatePlayerDetails from 'rest/firestore/updatePlayerDetails';
 
 export function EditPlayerModal(props) {
-  const { open, handleClose, ftPerc, alias, setIsLoading } = props;
+  const { open, handleClose, playerID, ftPerc, alias, setIsLoading } = props;
+  const { enqueueSnackbar } = useSnackbar();
   const [ftPercField, setFTPercField] = useState(ftPerc);
   // * Aliases are separated  by commas
   const [aliasField, setAliasField] = useState(alias.toString());
 
   const handleUpdate = async () => {
     setIsLoading(true);
+
+    const params = {
+      playerID,
+      ftPerc,
+      alias,
+      aliasesToAdd: aliasField
+    };
+    const { data, error } = await updatePlayerDetails(params);
+    if (!data || error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
+      enqueueSnackbar('Error updating player', { variant: 'error' });
+    } else {
+      enqueueSnackbar('Successfully updated player', { variant: 'success' });
+    }
 
     setIsLoading(false);
     handleClose();
@@ -44,7 +62,8 @@ export function EditPlayerModal(props) {
           onChange={(e) => setAliasField(e.target.value)}
           margin="dense"
           label="FT%"
-          helperText="Separate each alias with a comma with no spaces"
+          placeHolder="name1,name2..."
+          helperText="Add extra aliases here"
           fullWidth
           variant="standard"
         />
@@ -58,6 +77,7 @@ export function EditPlayerModal(props) {
 }
 
 EditPlayerModal.propTypes = {
+  playerID: PropTypes.string.isRequired,
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   ftPerc: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,

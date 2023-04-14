@@ -10,6 +10,7 @@ const uploadStats = require('./api/upload');
 const fetchForTable = require('./api/fetchForTable');
 const testFirebaseStuff = require('./api/testFirebaseStuff');
 const fetchPlayerData = require('./api/fetchPlayerData');
+const updatePlayerDetails = require('./api/updatePlayerDetails');
 
 // * Cloud triggers
 const upsertPlayerData = require('./api/triggers/games');
@@ -40,6 +41,7 @@ app.post('/upload', cors(corsOptionsDelegate), uploadStats);
 app.get('/testFunctions', cors(corsOptionsDelegate), testFirebaseStuff);
 app.post('/queryTableData', cors(corsOptionsDelegate), fetchForTable);
 app.get('/lookupPlayer', cors(corsOptionsDelegate), fetchPlayerData);
+app.post('/updatePlayerDetails', cors(corsOptionsDelegate), updatePlayerDetails);
 exports.app = functions.https.onRequest(app);
 
 // * Cloud Triggers
