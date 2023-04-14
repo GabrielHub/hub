@@ -1,33 +1,137 @@
 const admin = require('firebase-admin');
 const _ = require('lodash');
-// const mockData = require('../mocks/mockUploadData');
-const calculateTwoPointers = require('../utils/calculateTwoPointers');
-const calculateFreeThrowsMade = require('../utils/calculateFreeThrows');
-const calculateDoubles = require('../utils/calculateDoubles');
-const calculateAdvancedOffensiveStats = require('../utils/calculateAdvancedOffensiveStats');
-const calculateAdvancedDefensiveStats = require('../utils/calculateAdvancedDefensiveStats');
-const getExpectedORebounds = require('../utils/getExpectedORebounds');
-const constants = require('../constants');
+// const mockNanonetsData = require('../../mocks/mockNanonetsData');
+const calculateTwoPointers = require('../../utils/calculateTwoPointers');
+const calculateFreeThrowsMade = require('../../utils/calculateFreeThrows');
+const calculateDoubles = require('../../utils/calculateDoubles');
+const calculateAdvancedOffensiveStats = require('../../utils/calculateAdvancedOffensiveStats');
+const calculateAdvancedDefensiveStats = require('../../utils/calculateAdvancedDefensiveStats');
+const getExpectedORebounds = require('../../utils/getExpectedORebounds');
 
 // TODO We need to use this until we have more data (league average data)
 const DEFAULT_FT_PERC = 0.72;
-
 // ? Used to estimate OREB
 const FG_OREB_PERC = 0.22;
 const THREEP_OREB_PERC = 0.28;
 
-/**
- * @description format then upload player stats | kind of deprecated with the image upload webhook
- * @param {*} req
- * @param {*} res
- * @returns {*}
- */
-const uploadStats = async (req, res) => {
-  const { rawTeamData, rawPlayerData, key } = req.body;
+const COLUMN_LABELS = {
+  1: 'name',
+  2: 'grd',
+  3: 'pts',
+  4: 'treb',
+  5: 'ast',
+  6: 'stl',
+  7: 'blk',
+  8: 'pf',
+  9: 'tov',
+  10: 'fgm/fga', // * we'll need to split these
+  11: 'threepm/threepa'
+};
 
-  if (!key || typeof key !== 'string' || key !== constants.UPLOAD_KEY) {
-    throw Error('Invalid request parameters');
+/**
+ * @description take an array of strings that make up a player or team object
+ * @param {*} rows An array of cells, individual stats per player or team
+ * @param {*} propertyMapping Constant that holds the label mapping to stats
+ * @returns Object that is a team or player
+ */
+const mapRowsToData = (rows, propertyMapping) => {
+  const result = {};
+
+  rows.forEach((column) => {
+    const { text: stat, col } = column;
+    const property = propertyMapping[col];
+
+    if (property) {
+      // * Check if the property needs to be split (fg and 3p)
+      if (property.includes('/')) {
+        const [property1, property2] = property.split('/');
+        const [stat1, stat2] = stat.split('/');
+
+        result[property1] = parseInt(stat1, 10);
+        result[property2] = parseInt(stat2, 10);
+      } else if (!isNaN(stat)) {
+        result[property] = parseInt(stat, 10);
+      } else {
+        // * Add strings as is
+        result[property] = stat;
+      }
+    }
+  });
+
+  return result;
+};
+
+/**
+ * @description takes raw column data from nano and turns it into rows
+ * @param {*} tableData
+ * @returns
+ */
+const groupColumnsIntoRows = (tableData) => {
+  const rows = [];
+  let currentRow = [];
+
+  tableData.forEach((column, index) => {
+    currentRow.push(column);
+
+    // * There will always be 11 columns per row
+    if ((index + 1) % 11 === 0) {
+      // * If current row has 11 columns, push it to rows array
+      rows.push(currentRow);
+      currentRow = []; // Reset current row
+    }
+  });
+
+  // * Push any remaining columns to the last row
+  if (currentRow.length > 0) {
+    rows.push(currentRow);
   }
+
+  // * First row will always be the header values, which we don't need
+  if (rows.length > 0) {
+    rows.shift();
+  }
+
+  return rows;
+};
+
+const NanonetsWebhook = async (req, res) => {
+  const { result } = req.body;
+  const { message, moderated_boxes: tableData } = result;
+
+  if (message !== 'Success') {
+    throw new Error('Unsuccessful read');
+  }
+
+  // * Convert data to upload objects
+
+  const rawTeamData = {};
+  const rawPlayerData = [];
+
+  if (tableData.length > 2) {
+    throw new Error('Too many tables/teams');
+  }
+
+  tableData.forEach((table, index) => {
+    const teamKey = index + 1; // * for team 1 and 2
+    const rows = groupColumnsIntoRows(table.cells);
+
+    // * Team data is always the last row. Add it to object with key
+    const convertedTeamData = mapRowsToData(rows.pop(), COLUMN_LABELS);
+    rawTeamData[teamKey] = { ...convertedTeamData, team: teamKey };
+
+    // * Generate player data from cells
+    rows.forEach((playerData, pos) => {
+      const convertedPlayerData = mapRowsToData(playerData, COLUMN_LABELS);
+      rawPlayerData.push({
+        ...convertedPlayerData,
+        team: teamKey,
+        // * Player position defined from 1 - 5
+        pos: pos + 1
+      });
+    });
+  });
+
+  // * use upload functions
 
   const formattedTeamData = {};
   const teamReboundData = {};
@@ -36,7 +140,7 @@ const uploadStats = async (req, res) => {
   // * Calculate oreb for both teams first (estimations) then set basic stats
   Object.keys(rawTeamData).forEach((teamKey) => {
     const teamData = rawTeamData[teamKey];
-    const { reb, fgm, fga, threepm, threepa } = teamData;
+    const { treb: reb, fgm, fga, threepm, threepa } = teamData;
     const missed3P = threepa - threepm;
     const missed2P = fga - fgm - missed3P;
 
@@ -57,7 +161,7 @@ const uploadStats = async (req, res) => {
     // * Destructure stats that we'll use for calculations and readability
     const teamData = rawTeamData[teamKey];
     const opponent = teamKey === 1 ? rawTeamData[2] : rawTeamData[1];
-    const { pts, reb, tov, fgm, fga, threepm, threepa } = teamData;
+    const { pts, treb: reb, tov, fgm, fga, threepm, threepa } = teamData;
 
     // TODO Figure out a way to do team FTA and FT. They cannot be 0 or it breaks further calculations
     const { twopa, twopm } = calculateTwoPointers(fga, fgm, threepa, threepm);
@@ -75,7 +179,7 @@ const uploadStats = async (req, res) => {
     const opFTA = Math.round(opFTM / DEFAULT_FT_PERC) || 1;
 
     const { dreb, oreb } = teamReboundData[teamKey];
-    const ORBPerc = oreb / (oreb + (opponent.reb + teamReboundData[opponent.team].oreb));
+    const ORBPerc = oreb / (oreb + (opponent.treb + teamReboundData[opponent.team].oreb));
 
     // * Possessions
     const scoringPoss = fgm + (1 - (1 - (ftm / fta) ** 2)) * fta * 0.4;
@@ -83,7 +187,7 @@ const uploadStats = async (req, res) => {
       0.5 *
       (fga +
         0.4 * fta -
-        1.07 * (oreb / (oreb + opponent.reb)) * (fga - fgm) +
+        1.07 * (oreb / (oreb + opponent.treb)) * (fga - fgm) +
         tov +
         (opponent.fga +
           0.4 * opFTA -
@@ -240,7 +344,7 @@ const uploadStats = async (req, res) => {
     console.log('Document written with ID: ', docRef.id);
   });
 
-  res.json({ formattedPlayerData, formattedTeamData });
+  res.sendStatus(200);
 };
 
-module.exports = uploadStats;
+module.exports = NanonetsWebhook;

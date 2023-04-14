@@ -22,6 +22,7 @@ const calculateAdvancedDefensiveStats = (player, opponent, opOREB, team) => {
   const opMin = 20;
 
   const dorPerc = opOREB / (opOREB + team.dreb);
+  // * If an opponent takes 0 shots, defensive rating cannot be calculated
   const dfgPerc = opponent.fgm / opponent.fga;
   const FMWT = (dfgPerc * (1 - dorPerc)) / (dfgPerc * (1 - dorPerc) + (1 - dfgPerc) * dorPerc);
   const stops =
