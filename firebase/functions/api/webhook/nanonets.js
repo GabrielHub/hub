@@ -51,8 +51,11 @@ const mapRowsToData = (rows, propertyMapping) => {
         result[property2] = parseInt(stat2, 10);
       } else if (!isNaN(stat)) {
         result[property] = parseInt(stat, 10);
+      } else if (stat === 'O') {
+        // * Exception for common typo "O" instead of 0
+        result[property] = 0;
       } else {
-        // * Add strings as is
+        // * Add strings as is if they are not "O"
         result[property] = stat;
       }
     }
