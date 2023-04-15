@@ -5,7 +5,7 @@ const admin = require('firebase-admin');
 const updatePlayerDetails = async (req, res) => {
   // * aliasesToAdd only contains the new aliases to check against the database
   // * alias is the existing alias array
-  const { playerID, ftPerc, alias, aliasesToAdd } = req.body;
+  const { playerID, ftPerc, alias, aliasesToAdd = [] } = req.body;
 
   // * Sanitize FT format
   const formattedFT = parseInt(ftPerc, 10);
@@ -18,27 +18,25 @@ const updatePlayerDetails = async (req, res) => {
     throw new Error('Invalid ftPerc');
   }
 
-  if (!Array.isArray(aliasesToAdd)) {
-    throw new Error('Invalid aliases');
-  }
-
-  // * Trim inputs for whitespace and validate types
-  const formattedAlias = aliasesToAdd.map((name) => {
-    if (typeof name !== 'string') {
-      throw new Error('Invalid aliases');
-    }
-    return name.trim();
-  });
-
   const db = admin.firestore();
 
-  // * Make sure alias is unique
-  const querySnapshot = await db
-    .collection('players')
-    .where('alias', 'array-contains-any', formattedAlias)
-    .get();
-  if (querySnapshot.size) {
-    throw new Error(`Aliases already exist`);
+  if (aliasesToAdd.length) {
+    // * Trim inputs for whitespace and validate types
+    const formattedAlias = aliasesToAdd.map((name) => {
+      if (typeof name !== 'string') {
+        throw new Error('Invalid aliases');
+      }
+      return name.trim();
+    });
+
+    // * Make sure alias is unique
+    const querySnapshot = await db
+      .collection('players')
+      .where('alias', 'array-contains-any', formattedAlias)
+      .get();
+    if (querySnapshot.size) {
+      throw new Error(`Aliases already exist`);
+    }
   }
 
   const aliasesToUpdate = [...alias, ...aliasesToAdd];
