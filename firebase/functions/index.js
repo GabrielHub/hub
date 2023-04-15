@@ -11,6 +11,7 @@ const fetchForTable = require('./api/fetchForTable');
 const testFirebaseStuff = require('./api/testFirebaseStuff');
 const fetchPlayerData = require('./api/fetchPlayerData');
 const updatePlayerDetails = require('./api/updatePlayerDetails');
+const fetchIndividualRanking = require('./api/ranking');
 
 // * Cloud triggers
 const upsertPlayerData = require('./api/triggers/games');
@@ -45,6 +46,7 @@ app.get('/testFunctions', cors(corsOptionsDelegate), testFirebaseStuff);
 app.post('/queryTableData', cors(corsOptionsDelegate), fetchForTable);
 app.get('/lookupPlayer', cors(corsOptionsDelegate), fetchPlayerData);
 app.post('/updatePlayerDetails', cors(corsOptionsDelegate), updatePlayerDetails);
+app.get('/ranking', cors(corsOptionsDelegate), fetchIndividualRanking);
 // * webhook
 app.post('/nanonets/webhook', cors(corsOptionsDelegate), NanonetsWebhook);
 exports.app = functions.https.onRequest(app);
