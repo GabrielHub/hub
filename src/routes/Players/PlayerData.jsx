@@ -3,21 +3,20 @@ import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { Grid, IconButton, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import { fetchPlayerData } from 'rest';
+import { fetchPlayerData, fetchPlayerRanking } from 'rest';
 import { Loading } from 'components/Loading';
 import { THEME_COLORS } from 'constants';
 import { EditPlayerModal } from 'components/Modal';
+import { GameGrid } from 'components/GameGrid';
 import {
   PLAYER_AVERAGES_DEFENSE,
   PLAYER_AVERAGES_MISC,
-  PLAYER_AVERAGES_OFFENSE
+  PLAYER_AVERAGES_OFFENSE,
+  RECENT_GAMES_COLUMNS
 } from './constants';
 
-// TODO Display offensive/defensive ranking next to name
 // TODO Career Highs
 // TODO Last 5 games played
-// TODO Rankings for offense and defense
-// * for ranking https://stackoverflow.com/questions/74087802/finding-index-of-a-firestore-document-for-a-given-query
 // TODO Player Comparison Table
 
 export function PlayerData() {
@@ -26,11 +25,23 @@ export function PlayerData() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [playerData, setPlayerData] = useState(null);
+  const [playerRanking, setPlayerRanking] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleModalClose = () => {
     setIsOpen(false);
   };
+
+  const getPlayerRanking = useCallback(async () => {
+    setIsLoading(true);
+    const { data, error } = await fetchPlayerRanking(playerID);
+    if (error) {
+      enqueueSnackbar('Error reading data, please try a different user', { variant: 'error' });
+    } else {
+      setPlayerRanking(data);
+    }
+    setIsLoading(false);
+  }, [enqueueSnackbar, playerID]);
 
   const getPlayerData = useCallback(async () => {
     setIsLoading(true);
@@ -47,8 +58,9 @@ export function PlayerData() {
   useEffect(() => {
     if (playerID) {
       getPlayerData();
+      getPlayerRanking();
     }
-  }, [getPlayerData, playerID]);
+  }, [getPlayerData, getPlayerRanking, playerID]);
 
   return (
     <>
@@ -135,6 +147,11 @@ export function PlayerData() {
                   <b>Player Averages - Offense</b>
                 </Typography>
               </Grid>
+              <Grid xs={12} sx={{ paddingBottom: 4 }} item>
+                <Typography align="center" variant="h5" gutterBottom>
+                  <b>Ranked {playerRanking?.offense}</b>
+                </Typography>
+              </Grid>
               {PLAYER_AVERAGES_OFFENSE.map((stat) => (
                 <Grid xs={stat.size} key={stat.header} sx={{ padding: 2 }} item>
                   <Typography align="center" variant="h6">
@@ -165,7 +182,12 @@ export function PlayerData() {
               container>
               <Grid xs={12} sx={{ paddingBottom: 4 }} item>
                 <Typography align="center" variant="h5" gutterBottom>
-                  <b>Player Averages - Offense</b>
+                  <b>Player Averages - Defense</b>
+                </Typography>
+              </Grid>
+              <Grid xs={12} sx={{ paddingBottom: 4 }} item>
+                <Typography align="center" variant="h5" gutterBottom>
+                  <b>Ranked {playerRanking?.defense}</b>
                 </Typography>
               </Grid>
               {PLAYER_AVERAGES_DEFENSE.map((stat) => (
@@ -213,6 +235,14 @@ export function PlayerData() {
               ))}
             </Grid>
           </Grid>
+
+          {/* Last 5 games */}
+          <Grid xs={12} item>
+            <Typography align="center" variant="h5" gutterBottom>
+              Last 5 Games Played
+            </Typography>
+          </Grid>
+          <GameGrid playerID={playerID} columns={RECENT_GAMES_COLUMNS} />
         </Grid>
       )}
     </>
