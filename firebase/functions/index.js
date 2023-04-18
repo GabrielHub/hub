@@ -19,6 +19,7 @@ const upsertPlayerData = require('./api/triggers/games');
 
 // * Cron jobs
 const deleteDuplicateGames = require('./api/scheduled/deleteDuplicateGames');
+const generateLeagueAverage = require('./api/scheduled/generateLeagueAverage');
 
 // * webhooks
 const NanonetsWebhook = require('./api/webhook/nanonets');
@@ -56,6 +57,10 @@ exports.app = functions.https.onRequest(app);
 
 // * Cloud Triggers
 exports.upsertPlayerData = functions.firestore.document('games/{gameId}').onWrite(upsertPlayerData);
+exports.generateLeagueAverage = functions.pubsub
+  .schedule('0 23 * * 7')
+  .timeZone('America/New_York')
+  .onRun(generateLeagueAverage);
 exports.deleteDuplicateGames = functions.pubsub
   .schedule('0 23 * * *')
   .timeZone('America/New_York')
