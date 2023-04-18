@@ -4,6 +4,14 @@ export const ALGOLIA_PROJECT_ID = process.env.REACT_APP_ALGOLIA_PROJECT_ID;
 export const NANONET_KEY = process.env.REACT_APP_NANONET;
 export const NANONET_MODEL_ID = process.env.REACT_APP_MODEL_ID;
 
+export const POSITION_READABLE = {
+  1: 'PG',
+  2: 'SG',
+  3: 'SF',
+  4: 'PF',
+  5: 'C'
+};
+
 export const TEAM_STAT_READABLE = {
   team: 'TEAM',
   grd: 'GRADE',

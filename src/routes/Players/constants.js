@@ -1,3 +1,5 @@
+import { POSITION_READABLE } from 'constants';
+
 export const RECENT_PLAYERS_COLUMNS = [
   {
     field: 'name',
@@ -391,6 +393,15 @@ export const RECENT_GAMES_COLUMNS = [
     sortable: false
   },
   {
+    field: 'pos',
+    headerName: 'POS',
+    valueGetter: (params) => {
+      return POSITION_READABLE[params.value];
+    },
+    flex: 1,
+    sortable: false
+  },
+  {
     field: 'pts',
     headerName: 'PTS',
     type: 'number',
@@ -463,65 +474,30 @@ export const RECENT_GAMES_COLUMNS = [
     flex: 1
   },
   {
-    field: 'tovPerc',
-    headerName: 'TOV%',
-    type: 'number',
-    description: 'Turnover percentage is an estimate of turnovers per 100 plays',
-    flex: 1,
-    sortable: false
-  },
-  {
-    field: 'astPerc',
-    headerName: 'AST%',
-    type: 'number',
-    description:
-      'Assist percentage is an estimate of the percentage of teammate field goals a player assisted while he was on the floor',
-    flex: 1,
-    sortable: false
-  },
-  {
-    field: 'astToRatio',
-    headerName: 'AST/TO',
+    field: 'fgm',
+    headerName: 'FGM',
     type: 'number',
     flex: 1,
     sortable: false
   },
   {
-    field: 'fgPerc',
-    headerName: 'FG%',
+    field: 'fga',
+    headerName: 'FGA',
     type: 'number',
     flex: 1,
     sortable: false
   },
   {
-    field: 'threePerc',
-    headerName: '3P%',
+    field: 'threepm',
+    headerName: '3PM',
     type: 'number',
     flex: 1,
     sortable: false
   },
   {
-    field: 'efgPerc',
-    headerName: 'EFG%',
-    description: 'FG% adjusted for 3 Pointers',
+    field: 'threepa',
+    headerName: '3PA',
     type: 'number',
-    flex: 1,
-    sortable: false
-  },
-  {
-    field: 'tsPerc',
-    headerName: 'TS%',
-    type: 'number',
-    description:
-      'A measure of shooting efficiency that takes into account field goals, 3-point field goals, and free throws',
-    flex: 1,
-    sortable: false
-  },
-  {
-    field: 'threepAR',
-    headerName: '3PaR',
-    type: 'number',
-    description: 'Percentage of shots taken from 3',
     flex: 1,
     sortable: false
   },
