@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { Grid, IconButton, Typography } from '@mui/material';
+import { Grid, IconButton, Typography, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { fetchPlayerData, fetchPlayerRanking } from 'rest';
 import { Loading } from 'components/Loading';
@@ -21,6 +21,7 @@ import {
 
 export function PlayerData() {
   const { playerID } = useParams();
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -78,6 +79,11 @@ export function PlayerData() {
 
       {playerData && (
         <Grid sx={{ padding: 1 }} justifyContent="center" container>
+          <Grid xs={12} item>
+            <Button variant="outlined" onClick={() => navigate('/hub/players')}>
+              Go Back
+            </Button>
+          </Grid>
           <Grid xs={10} sx={{ marginBottom: 16 }} container item>
             <Grid
               sx={{

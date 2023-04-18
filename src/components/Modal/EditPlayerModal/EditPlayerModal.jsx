@@ -20,11 +20,13 @@ export function EditPlayerModal(props) {
   const handleUpdate = async () => {
     setIsLoading(true);
 
+    const aliasesToAdd = aliasField ? aliasField.split(',') : [];
+
     const params = {
       playerID,
       ftPerc: parseInt(ftPercField, 10),
       alias,
-      aliasesToAdd: aliasField.split(',')
+      aliasesToAdd
     };
     const { data, error } = await updatePlayerDetails(params);
     if (!data || error) {
