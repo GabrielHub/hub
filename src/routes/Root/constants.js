@@ -1,12 +1,12 @@
-import { getPercentValues } from 'utils';
+import { getNameRankValue, getPercentValues } from 'utils';
 
 export const OFFENSIVE_PLAYERS_COLUMNS = [
   {
     field: 'name',
     headerName: 'Name',
+    valueGetter: getNameRankValue,
     width: 150,
     sortable: false
-    // editable: true
   },
   {
     field: 'gp',
@@ -21,6 +21,7 @@ export const OFFENSIVE_PLAYERS_COLUMNS = [
     type: 'number',
     description:
       'Usage percentage is an estimate of the percentage of team plays used by a player while they were on the floor',
+    valueGetter: getPercentValues,
     flex: 1
   },
   {
@@ -60,6 +61,7 @@ export const OFFENSIVE_PLAYERS_COLUMNS = [
     headerName: 'TOV%',
     type: 'number',
     description: 'Turnover percentage is an estimate of turnovers per 100 plays',
+    valueGetter: getPercentValues,
     flex: 1
   },
   {
@@ -68,6 +70,7 @@ export const OFFENSIVE_PLAYERS_COLUMNS = [
     type: 'number',
     description:
       'Assist percentage is an estimate of the percentage of teammate field goals a player assisted while he was on the floor',
+    valueGetter: getPercentValues,
     flex: 1
   },
   {
@@ -81,6 +84,7 @@ export const OFFENSIVE_PLAYERS_COLUMNS = [
     headerName: 'EFG%',
     description: 'FG% adjusted for 3 Pointers',
     type: 'number',
+    valueGetter: getPercentValues,
     flex: 1
   },
   {
@@ -89,6 +93,7 @@ export const OFFENSIVE_PLAYERS_COLUMNS = [
     type: 'number',
     description:
       'A measure of shooting efficiency that takes into account field goals, 3-point field goals, and free throws',
+    valueGetter: getPercentValues,
     flex: 1
   },
   {
@@ -96,6 +101,7 @@ export const OFFENSIVE_PLAYERS_COLUMNS = [
     headerName: '3PaR',
     type: 'number',
     description: 'Percentage of shots taken from 3',
+    valueGetter: getPercentValues,
     flex: 1
   },
   {
@@ -115,15 +121,10 @@ export const OFFENSIVE_PLAYERS_DEFAULT_SORTS = {
 
 export const DEFENSIVE_PLAYERS_COLUMNS = [
   {
-    field: 'defensiveRanking',
-    headerName: 'DR',
-    width: 150,
-    sortable: false
-  },
-  {
     field: 'name',
     headerName: 'Name',
     width: 150,
+    valueGetter: getNameRankValue,
     sortable: false
   },
   {
@@ -178,6 +179,12 @@ export const DEFENSIVE_PLAYERS_COLUMNS = [
     flex: 1
   },
   {
+    field: 'oFGA',
+    headerName: 'oFGA',
+    type: 'number',
+    flex: 1
+  },
+  {
     field: 'oFGPerc',
     headerName: 'oFG%',
     description: `Opponent's FG%`,
@@ -190,6 +197,7 @@ export const DEFENSIVE_PLAYERS_COLUMNS = [
     headerName: 'o3P%',
     type: 'number',
     description: `Opponent's 3P%`,
+    valueGetter: getPercentValues,
     flex: 1
   },
   {
@@ -197,6 +205,7 @@ export const DEFENSIVE_PLAYERS_COLUMNS = [
     headerName: 'oEFG%',
     type: 'number',
     description: `Opponent's FG% adjusted for 3 Pointers`,
+    valueGetter: getPercentValues,
     flex: 1
   },
   {
@@ -204,13 +213,14 @@ export const DEFENSIVE_PLAYERS_COLUMNS = [
     headerName: 'REB%',
     type: 'number',
     description: `The percentage of available rebounds a player obtains while on the floor`,
+    valueGetter: getPercentValues,
     flex: 1
   }
 ];
 
 export const DEFENSIVE_PLAYERS_DEFAULT_SORTS = {
   field: 'defensiveRanking',
-  type: 'desc'
+  type: 'asc'
 };
 
 export default {};

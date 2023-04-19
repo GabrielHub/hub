@@ -61,7 +61,9 @@ PlayerGrid.propTypes = {
   defaultSortField: PropTypes.string.isRequired,
   defaultSortType: PropTypes.string.isRequired,
   columns: PropTypes.arrayOf(
-    PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]))
+    PropTypes.objectOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.func])
+    )
   ).isRequired
 };
 

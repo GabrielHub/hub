@@ -1,6 +1,7 @@
-import React from 'react';
-import { Grid, Link, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Button, Grid, Link, Typography } from '@mui/material';
 import { PlayerGrid } from 'components/PlayerGrid';
+import { OffenseDescriptionModal, DefenseDescriptionModal } from 'components/Modal';
 import {
   DEFENSIVE_PLAYERS_COLUMNS,
   DEFENSIVE_PLAYERS_DEFAULT_SORTS,
@@ -9,8 +10,19 @@ import {
 } from './constants';
 
 export function Root() {
+  const [offenseModalOpen, setOffenseModalOpen] = useState(false);
+  const [defenseModalOpen, setDefenseModalOpen] = useState(false);
+
   return (
     <Grid sx={{ padding: 2, height: 500 }} spacing={2} container>
+      <OffenseDescriptionModal
+        open={offenseModalOpen}
+        handleClose={() => setOffenseModalOpen(false)}
+      />
+      <DefenseDescriptionModal
+        open={defenseModalOpen}
+        handleClose={() => setDefenseModalOpen(false)}
+      />
       <Grid xs={12} container item>
         <Grid xs={12} item>
           <Typography variant="h4" gutterBottom>
@@ -39,11 +51,20 @@ export function Root() {
           </Typography>
         </Grid>
       </Grid>
-      <Grid xs container item>
-        <Grid xs={12} item>
+      <Grid xs={12} sx={{ paddingBottom: 2 }} container item>
+        <Grid
+          xs={12}
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ paddingBottom: 2 }}
+          container
+          item>
           <Typography variant="h5" gutterBottom>
             Players Ranked By Offense (min 5 games)
           </Typography>
+          <Button variant="outlined" onClick={() => setOffenseModalOpen(true)}>
+            How is this calculated?
+          </Button>
         </Grid>
         <PlayerGrid
           columns={OFFENSIVE_PLAYERS_COLUMNS}
@@ -51,11 +72,20 @@ export function Root() {
           defaultSortType={OFFENSIVE_PLAYERS_DEFAULT_SORTS.type}
         />
       </Grid>
-      <Grid xs container item>
-        <Grid xs={12} item>
+      <Grid xs={12} sx={{ paddingBottom: 2 }} container item>
+        <Grid
+          xs={12}
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ paddingBottom: 2 }}
+          container
+          item>
           <Typography variant="h5" gutterBottom>
             Players Ranked By Defense (min 5 games)
           </Typography>
+          <Button variant="outlined" onClick={() => setDefenseModalOpen(true)}>
+            How is this calculated?
+          </Button>
         </Grid>
         <PlayerGrid
           columns={DEFENSIVE_PLAYERS_COLUMNS}
