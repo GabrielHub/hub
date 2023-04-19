@@ -11,13 +11,14 @@ const round = require('./roundForReadable');
 const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) => {
   // TODO Calculate PER, Pace and Add PProd (points produced) and stops
   // * These are not values we want to average
-  // * FT% is a constant defined by the user. We won't update this ever programatically
+  // * FT% is a constant defined by the user. We won't update this ever programmatically
   const propertiesToSkip = ['name', 'alias', 'ftPerc'];
   // * Initialize player so we can add values before dividing at the end
   const playerData = {
     name,
     alias: alias.length ? alias : [name],
     ftPerc,
+    pace: 0,
     pts: 0,
     treb: 0,
     ast: 0,

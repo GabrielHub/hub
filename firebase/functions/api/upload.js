@@ -182,6 +182,7 @@ const uploadStats = async (req, res) => {
     // * Add simple stats to player object
     formattedPlayer = {
       ...playerData,
+      pace: team.totalPoss,
       mp,
       dreb,
       oreb,

@@ -18,6 +18,7 @@ const STATS_TO_ADD = [
   'fgm',
   'fta',
   'ftm',
+  'pace',
   'gameScore',
   'usageRate'
 ];

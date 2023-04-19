@@ -16,7 +16,6 @@ import {
 } from './constants';
 
 // TODO Career Highs
-// TODO Last 5 games played
 // TODO Player Comparison Table
 
 export function PlayerData() {
