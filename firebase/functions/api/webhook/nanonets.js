@@ -101,6 +101,7 @@ const groupColumnsIntoRows = (tableData) => {
 
 const NanonetsWebhook = async (req, res) => {
   const { result } = req.body;
+  // const { result } = mockNanonetsData;
   const { message, moderated_boxes: tableData } = result;
 
   if (message !== 'Success') {

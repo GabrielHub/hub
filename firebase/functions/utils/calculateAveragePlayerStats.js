@@ -25,7 +25,6 @@ const isValidStatline = (stat, value) => {
  * @returns
  */
 const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) => {
-  // TODO Calculate PER
   // * These are not values we want to average
   // * FT% is a constant defined by the user. We won't update this ever programmatically
   const propertiesToSkip = ['name', 'alias', 'ftPerc'];
@@ -66,7 +65,8 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
     o3PM: 0,
     oFGA: 0,
     oFGM: 0,
-    aPER: 0
+    aPER: 0,
+    PER: 0
   };
 
   // * DRtg can be NaN if the opponent took 0 fg, so skip over games where this is the case and do different division

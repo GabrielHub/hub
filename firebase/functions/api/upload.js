@@ -253,12 +253,13 @@ const uploadStats = async (req, res) => {
     );
 
     // * Calculate PER
-    const aPER = PER.calculateAPER(formattedPlayer, team, league);
+    const { aPER, PER: playerPER } = PER.calculateAPER(formattedPlayer, team, league);
     // TODO Calculate PER with league aPER
 
     return {
       ...formattedPlayer,
       aPER,
+      PER: playerPER,
       oFGA,
       oFGM,
       o3PA,

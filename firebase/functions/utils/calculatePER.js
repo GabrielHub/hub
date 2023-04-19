@@ -19,14 +19,18 @@ const calculateAPER = (player, team, league) => {
       player.pf * (league.ftm / league.pf - 0.44 * (league.fta / league.pf) * VOP));
 
   const paceAdjustment = league.pace / team.totalPoss;
-  const aPER = paceAdjustment * uPER;
+  let aPER = paceAdjustment * uPER;
 
-  // * PER = aPER * (15 / league.aPER)
+  let PER = aPER * (league.PER / league.aPER);
 
-  return aPER;
+  // * For some reason aPER can be negative... make it 0 if it is
+  // TODO More research into why this is sometimes a negative value
+  if (aPER < 0) {
+    aPER = null;
+    PER = null;
+  }
+
+  return { aPER, PER };
 };
-
-// TODO Another function to calculate adjusted PER once we have enough data
-// ? We need pace adjustment, pace for each player and league average pace
 
 module.exports = { calculateAPER };
