@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Grid, Link, Typography } from '@mui/material';
 import { PlayerGrid } from 'components/PlayerGrid';
-import { OffenseDescriptionModal, DefenseDescriptionModal } from 'components/Modal';
+import { DefenseDescriptionModal } from 'components/Modal';
+import { OffenseDescriptionModal } from 'components/Modal/OffenseDescriptionModal/OffenseDescriptionModal';
 import {
   DEFENSIVE_PLAYERS_COLUMNS,
   DEFENSIVE_PLAYERS_DEFAULT_SORTS,
