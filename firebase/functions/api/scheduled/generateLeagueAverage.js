@@ -23,6 +23,15 @@ const STATS_TO_ADD = [
   'usageRate'
 ];
 
+const getPaceAmounts = (playerList) => {
+  return playerList.reduce((count, player) => {
+    if (player?.pace) {
+      return count + 1;
+    }
+    return count;
+  }, 0);
+};
+
 const generateLeagueAverage = async () => {
   const db = admin.firestore();
   try {
@@ -46,11 +55,19 @@ const generateLeagueAverage = async () => {
     // * Average stats per game played for each player
     playerList.forEach((playerData) => {
       STATS_TO_ADD.forEach((stat) => {
-        averageGameStats[stat] += playerData[stat];
+        if (playerData[stat]) {
+          averageGameStats[stat] += playerData[stat];
+        }
       });
     });
     Object.keys(averageGameStats).forEach((stat) => {
-      averageGameStats[stat] = round(averageGameStats[stat] / playerList.length);
+      // * For now hardcode this missing stat (pace)
+      if (stat === 'pace') {
+        const paceLength = getPaceAmounts(playerList);
+        averageGameStats[stat] = round(averageGameStats[stat] / paceLength);
+      } else {
+        averageGameStats[stat] = round(averageGameStats[stat] / playerList.length);
+      }
     });
 
     await db.collection('league').add({

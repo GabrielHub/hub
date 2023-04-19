@@ -1,3 +1,4 @@
+// * Guess the expected o rebounds using a normal distribution
 const getExpectedORebounds = (treb, expected) => {
   const stdDev = treb / 6;
   const randomNumber = stdDev * (2 * Math.random() - 1);

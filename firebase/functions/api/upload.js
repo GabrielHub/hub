@@ -7,10 +7,11 @@ const calculateDoubles = require('../utils/calculateDoubles');
 const calculateAdvancedOffensiveStats = require('../utils/calculateAdvancedOffensiveStats');
 const calculateAdvancedDefensiveStats = require('../utils/calculateAdvancedDefensiveStats');
 const getExpectedORebounds = require('../utils/getExpectedORebounds');
+const estimateFreeThrowAttempts = require('../utils/estimateFreeThrowAttempts');
 const constants = require('../constants');
 
 // TODO We need to use this until we have more data (league average data)
-const DEFAULT_FT_PERC = 0.72;
+const DEFAULT_FT_PERC = 72;
 
 // ? Used to estimate OREB
 const FG_OREB_PERC = 0.22;
@@ -32,6 +33,41 @@ const uploadStats = async (req, res) => {
   const formattedTeamData = {};
   const teamReboundData = {};
   const playerReboundData = {};
+  const playerFreeThrowData = {};
+
+  // * Fetch possible Free Throw data for each player
+  const playerNames = rawPlayerData.map(({ name }) => name);
+  const playerFT = [];
+  await admin
+    .firestore()
+    .collection('players')
+    .where('alias', 'array-contains-any', playerNames)
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const { alias, ftPerc } = doc.data();
+        playerFT.push({ alias, ftPerc });
+      });
+    });
+
+  // * Calculate FTA for each player (must be done before team calculations to get team total FTA)
+  rawPlayerData.forEach((playerData) => {
+    const { fga, fgm, threepa, threepm, pts, name, team } = playerData;
+    // * Estimate FTA
+    const { twopm } = calculateTwoPointers(fga, fgm, threepa, threepm);
+    const ftm = calculateFreeThrowsMade(pts, twopm, threepm);
+    // * We cannot get the FTA without knowing FT%, so find it if the player exists and has a default FT Perc
+    const { ftPerc = DEFAULT_FT_PERC } = playerFT.find(({ alias }) => alias.includes(name)) || {};
+    const fta = ftm === 0 ? 0 : estimateFreeThrowAttempts(ftm, ftPerc);
+    // * Name : {fta, team}
+    playerFreeThrowData[name] = { fta, team };
+  });
+  // * Add to sum for the team total
+  const teamFreeThrowData = Object.values(playerFreeThrowData).reduce((acc, player) => {
+    const { fta, team } = player;
+    acc[team] = (acc[team] || 0) + fta;
+    return acc;
+  }, []);
 
   // * Calculate oreb for both teams first (estimations) then set basic stats
   Object.keys(rawTeamData).forEach((teamKey) => {
@@ -40,6 +76,7 @@ const uploadStats = async (req, res) => {
     const missed3P = threepa - threepm;
     const missed2P = fga - fgm - missed3P;
 
+    // * Estimate OREB
     const expected = Math.floor(missed3P * THREEP_OREB_PERC + missed2P * FG_OREB_PERC);
     const oreb = getExpectedORebounds(reb, expected);
     const dreb = Math.abs(reb - oreb);
@@ -59,20 +96,12 @@ const uploadStats = async (req, res) => {
     const opponent = teamKey === 1 ? rawTeamData[2] : rawTeamData[1];
     const { pts, reb, tov, fgm, fga, threepm, threepa } = teamData;
 
-    // TODO Figure out a way to do team FTA and FT. They cannot be 0 or it breaks further calculations
     const { twopa, twopm } = calculateTwoPointers(fga, fgm, threepa, threepm);
     // * We cannot get the FTA without knowing FT%, so just calculate FTM
-    const ftm = calculateFreeThrowsMade(pts, twopm, threepm) || 1;
-    const fta = Math.round(ftm / DEFAULT_FT_PERC) || 1;
-
-    const { twopm: oppTwoPM } = calculateTwoPointers(
-      opponent.fga,
-      opponent.fgm,
-      opponent.threepa,
-      opponent.threepm
-    );
-    const opFTM = calculateFreeThrowsMade(opponent.pts, oppTwoPM, opponent.threepm) || 1;
-    const opFTA = Math.round(opFTM / DEFAULT_FT_PERC) || 1;
+    const ftm = calculateFreeThrowsMade(pts, twopm, threepm) || 0;
+    // * Add up FTA from previous teamFreeThrowData calculation. This cannot be 0 (set to 1) otherwise we divide by 0
+    const fta = teamFreeThrowData?.[teamKey] || 1;
+    const opFTA = teamFreeThrowData?.[opponent.team] || 1;
 
     const { dreb, oreb } = teamReboundData[teamKey];
     const ORBPerc = oreb / (oreb + (opponent.reb + teamReboundData[opponent.team].oreb));
@@ -173,9 +202,8 @@ const uploadStats = async (req, res) => {
     const dreb = treb - oreb;
     // * Get 2PM to figure out FTM
     const { twopa, twopm } = calculateTwoPointers(fga, fgm, threepa, threepm);
-    // * We cannot get the FTA without knowing FT%, so just calculate FTM
     const ftm = calculateFreeThrowsMade(pts, twopm, threepm);
-    const fta = Math.round(ftm / DEFAULT_FT_PERC); // TODO Use account stored FT % if acc already exists
+    const fta = playerFreeThrowData[name]?.fta;
     // * double double, triple doubles, quadruple doubles
     const { dd, td, qd } = calculateDoubles(pts, treb, ast, stl, blk);
 

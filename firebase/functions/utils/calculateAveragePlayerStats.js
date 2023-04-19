@@ -1,4 +1,20 @@
 const round = require('./roundForReadable');
+const getAmountToAverage = require('./getAmountToAverage');
+
+/**
+ * @description complex check for valid stats. ortg and drtg are sometimes 0, but those are not valid numbers
+ * @param {*} stat
+ * @param {*} value
+ * @returns {boolean}
+ */
+const isValidStatline = (stat, value) => {
+  return Boolean(
+    typeof value !== 'string' &&
+      !Number.isNaN(value) &&
+      !(stat === 'ortg' && value === 0) &&
+      !(stat === 'drtg' && value === 0)
+  );
+};
 
 /**
  * @description format and calculate player averages for player object
@@ -9,7 +25,7 @@ const round = require('./roundForReadable');
  * @returns
  */
 const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) => {
-  // TODO Calculate PER, Pace and Add PProd (points produced) and stops
+  // TODO Calculate PER
   // * These are not values we want to average
   // * FT% is a constant defined by the user. We won't update this ever programmatically
   const propertiesToSkip = ['name', 'alias', 'ftPerc'];
@@ -58,21 +74,22 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
   // * Sum the basic values (some % values are in here because they use team or opponent data)
   gameData.forEach((data) => {
     Object.keys(data).forEach((stat) => {
-      // console.log(stat, Object.prototype.hasOwnProperty.call(playerData, stat));
       if (
         Object.prototype.hasOwnProperty.call(playerData, stat) &&
         !propertiesToSkip.includes(stat)
       ) {
-        // * check if number is NaN
-        if (!Number.isNaN(data[stat])) {
+        // * check if number is NaN (skip invalid data from bad data processing)
+        if (isValidStatline(stat, data[stat])) {
           // * Normal logic for stats that have values
           playerData[stat] += data[stat];
         } else if (Object.prototype.hasOwnProperty.call(statsWithNaN, stat)) {
           // * Update it with one less games to count for the averages
-          statsWithNaN[stat] -= statsWithNaN[stat];
+          statsWithNaN[stat] -= 1;
         } else {
-          // * Add this stat to start counting games not including NaN games
-          statsWithNaN[stat] = gameData.length - 1;
+          // * Stat may not exist in all games
+          const amountToDivideBy = getAmountToAverage(gameData, stat);
+          // * Add this stat to start counting games not including NaN games, minus 1 for the current time we're counting
+          statsWithNaN[stat] = amountToDivideBy - 1;
         }
       }
     });
@@ -88,12 +105,21 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
       // ? Rounding here saves a loop but also makes the Perc calculations below less precise...
 
       // * Check if stat is normal (never had a NaN value)
-      let divideFactor = gameData.length;
+      let divideFactor = 0;
       if (Object.prototype.hasOwnProperty.call(statsWithNaN, stat) && statsWithNaN[stat] > 0) {
         // * if there aren't enough games, avoid dividing by 0 or a - number
         divideFactor = statsWithNaN[stat];
+      } else {
+        // * Should usually be the length, but could possibly not exist
+        // * Stats may not exist if they were added after data was being generated (PER, pace, pProd)
+        divideFactor = getAmountToAverage(gameData, stat);
       }
       playerData[stat] = round(playerData[stat] / divideFactor);
+
+      // * do not store bad information
+      if (Number.isNaN(playerData[stat])) {
+        playerData[stat] = null;
+      }
     }
   });
 
@@ -115,6 +141,26 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
   playerData.o3PPerc = round(100 * (playerData.o3PM / playerData.o3PA)) || null;
   playerData.oEFGPerc =
     round(100 * ((playerData.oFGM + 0.5 ** playerData.o3PM) / playerData.oFGA)) || null;
+
+  // * Calculate offensive and defensive rankings using weights between ortg/drtg and usage/oFGA
+
+  /*
+    For instance, using the 2020-21 NBA season data, the league average usage rate and offensive rating were 20.3% and 110.7, respectively, with standard deviations of 5.8% and 7.2. Using these values, we can calculate the weights as follows:
+    Weight of usage rate = 5.8 / (5.8 + 7.2) = 0.446
+    Weight of offensive rating = 7.2 / (5.8 + 7.2) = 0.554
+  */
+  const weightUSG = 0.446;
+  const weightORTG = 0.554;
+  playerData.offensiveRanking = playerData.ortg * weightORTG + playerData.usageRate * weightUSG;
+
+  /*
+    The league averages for drtg and oppFGA for the most recent NBA season. For example, in the 2020-21 NBA season, the league average drtg was 111.8 and the league average oppFGA was 89.5. You can use these values to calculate the weights as follows:
+    Weight of drtg = 89.5 / (111.8 + 89.5) = 0.444
+    Weight of oppFGA = 111.8 / (111.8 + 89.5) = 0.556
+  */
+  const weightOFGA = 0.556;
+  const weightDRTG = 0.444;
+  playerData.defensiveRanking = playerData.ortg * weightDRTG - playerData.oFGA * weightOFGA;
 
   return playerData;
 };

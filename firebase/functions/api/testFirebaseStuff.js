@@ -5,21 +5,9 @@ const calculateAveragePlayerStats = require('../utils/calculateAveragePlayerStat
 
 // * Just using this to test some stuff I don't want to set up the firestore emulator for
 const testFirebaseStuff = async (req, res) => {
-  /* const db = admin.firestore();
-  await db
-    .collection('players')
-    .where('gp', '<', 5)
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        console.log('DELETING', doc.data().name);
-        doc.ref.delete();
-      });
-    }); */
-
   const db = admin.firestore();
 
-  const name = 'WetBread';
+  const name = 'Beach';
 
   const playerQuerySnapshot = await db
     .collection('players')
@@ -45,6 +33,7 @@ const testFirebaseStuff = async (req, res) => {
     // eslint-disable-next-line no-console
     console.log('gameData', avgPlayerStats);
   }
+
   res.send('Stop using me');
 };
 
