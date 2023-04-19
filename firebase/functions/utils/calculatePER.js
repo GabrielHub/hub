@@ -1,9 +1,9 @@
-const uPER = (player, team, league) => {
+const calculateAPER = (player, team, league) => {
   const factor = 2 / 3 - (0.5 * (league.ast / league.fgm)) / (2 * (league.fgm / league.ftm));
   const VOP = league.pts / (league.fga - league.oreb + league.tov + 0.44 * league.fta);
   const DRBPerc = (league.treb - league.oreb) / league.treb;
 
-  const uPERCalculation =
+  const uPER =
     (1 / player.mp) *
     (player.threepm +
       (2 / 3) * player.ast +
@@ -18,10 +18,15 @@ const uPER = (player, team, league) => {
       VOP * DRBPerc * player.blk -
       player.pf * (league.ftm / league.pf - 0.44 * (league.fta / league.pf) * VOP));
 
-  return uPERCalculation;
+  const paceAdjustment = league.pace / team.totalPoss;
+  const aPER = paceAdjustment * uPER;
+
+  // * PER = aPER * (15 / league.aPER)
+
+  return aPER;
 };
 
 // TODO Another function to calculate adjusted PER once we have enough data
 // ? We need pace adjustment, pace for each player and league average pace
 
-module.exports = { uPER };
+module.exports = { calculateAPER };

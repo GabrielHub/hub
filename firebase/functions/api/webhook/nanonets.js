@@ -8,6 +8,7 @@ const calculateAdvancedOffensiveStats = require('../../utils/calculateAdvancedOf
 const calculateAdvancedDefensiveStats = require('../../utils/calculateAdvancedDefensiveStats');
 const getExpectedORebounds = require('../../utils/getExpectedORebounds');
 const estimateFreeThrowAttempts = require('../../utils/estimateFreeThrowAttempts');
+const PER = require('../../utils/calculatePER');
 
 // TODO We need to use this until we have more data (league average data)
 const DEFAULT_FT_PERC = 0.72;
@@ -141,11 +142,26 @@ const NanonetsWebhook = async (req, res) => {
   const playerReboundData = {};
   const playerFreeThrowData = {};
 
+  const db = admin.firestore();
+  // * Fetch league data for PER
+  const league = await db
+    .collection('league')
+    .orderBy('createdAt', 'desc')
+    .limit(1)
+    .get()
+    .then((querySnapshot) => {
+      // * should only be one because of limit
+      const leagueData = [];
+      querySnapshot.forEach((doc) => {
+        leagueData.push(doc.data());
+      });
+      return leagueData[0];
+    });
+
   // * Fetch possible Free Throw data for each player
   const playerNames = rawPlayerData.map(({ name }) => name);
   const playerFT = [];
-  await admin
-    .firestore()
+  await db
     .collection('players')
     .where('alias', 'array-contains-any', playerNames)
     .get()
@@ -342,8 +358,13 @@ const NanonetsWebhook = async (req, res) => {
       team
     );
 
+    // * Calculate PER
+    const aPER = PER.calculateAPER(formattedPlayer, team, league);
+    // TODO Calculate PER with league aPER
+
     return {
       ...formattedPlayer,
+      aPER,
       oFGA,
       oFGM,
       o3PA,

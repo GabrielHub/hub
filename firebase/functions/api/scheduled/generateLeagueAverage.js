@@ -20,12 +20,18 @@ const STATS_TO_ADD = [
   'ftm',
   'pace',
   'gameScore',
-  'usageRate'
+  'usageRate',
+  'aPER'
 ];
 
-const getPaceAmounts = (playerList) => {
+/**
+ * @description finds amount to divide by for stats that aren't valid across all players (APER and PACE)
+ * @param {*} playerList
+ * @returns
+ */
+const getMissingStatAmount = (playerList, stat) => {
   return playerList.reduce((count, player) => {
-    if (player?.pace) {
+    if (player?.[stat]) {
       return count + 1;
     }
     return count;
@@ -34,6 +40,10 @@ const getPaceAmounts = (playerList) => {
 
 const generateLeagueAverage = async () => {
   const db = admin.firestore();
+
+  // * Missing Data, data that may not be there for all players
+  const MISSING_DATA = ['pace', 'aPER'];
+
   try {
     const querySnapshot = await db.collection('players').get();
 
@@ -62,13 +72,16 @@ const generateLeagueAverage = async () => {
     });
     Object.keys(averageGameStats).forEach((stat) => {
       // * For now hardcode this missing stat (pace)
-      if (stat === 'pace') {
-        const paceLength = getPaceAmounts(playerList);
+      if (MISSING_DATA.includes(stat)) {
+        const paceLength = getMissingStatAmount(playerList, stat);
         averageGameStats[stat] = round(averageGameStats[stat] / paceLength);
       } else {
         averageGameStats[stat] = round(averageGameStats[stat] / playerList.length);
       }
     });
+
+    // * Set league average PER to 15 as per Hollinger https://www.basketball-reference.com/about/per.html
+    averageGameStats.PER = 15;
 
     await db.collection('league').add({
       ...averageGameStats,
