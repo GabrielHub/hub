@@ -1,3 +1,5 @@
+import { getPercentValues } from 'utils';
+
 export const OFFENSIVE_PLAYERS_COLUMNS = [
   {
     field: 'name',
@@ -107,11 +109,17 @@ export const OFFENSIVE_PLAYERS_COLUMNS = [
 ];
 
 export const OFFENSIVE_PLAYERS_DEFAULT_SORTS = {
-  field: 'ortg',
+  field: 'offensiveRanking',
   type: 'desc'
 };
 
 export const DEFENSIVE_PLAYERS_COLUMNS = [
+  {
+    field: 'defensiveRanking',
+    headerName: 'DR',
+    width: 150,
+    sortable: false
+  },
   {
     field: 'name',
     headerName: 'Name',
@@ -173,6 +181,7 @@ export const DEFENSIVE_PLAYERS_COLUMNS = [
     field: 'oFGPerc',
     headerName: 'oFG%',
     description: `Opponent's FG%`,
+    valueGetter: getPercentValues,
     type: 'number',
     flex: 1
   },
@@ -200,8 +209,8 @@ export const DEFENSIVE_PLAYERS_COLUMNS = [
 ];
 
 export const DEFENSIVE_PLAYERS_DEFAULT_SORTS = {
-  field: 'drtg',
-  type: 'asc'
+  field: 'defensiveRanking',
+  type: 'desc'
 };
 
 export default {};

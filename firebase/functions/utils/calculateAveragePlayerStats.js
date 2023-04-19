@@ -160,7 +160,7 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
   */
   const weightOFGA = 0.556;
   const weightDRTG = 0.444;
-  playerData.defensiveRanking = playerData.ortg * weightDRTG - playerData.oFGA * weightOFGA;
+  playerData.defensiveRanking = playerData.drtg * weightDRTG - playerData.oFGA * weightOFGA;
 
   return playerData;
 };

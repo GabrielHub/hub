@@ -26,7 +26,7 @@ export function Root() {
         </Grid>
         <Grid xs={12} item>
           <Typography variant="body2" gutterBottom>
-            This is an open source project built with React, Firebase, Express and Node. Report bugs
+            This is an open source project built with Firebase, Express, React and Node. Report bugs
             and view updates{' '}
             <Link
               href="https://github.com/GabrielHub/hub"

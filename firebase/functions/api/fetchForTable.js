@@ -6,6 +6,7 @@ const fetchForTable = async (req, res) => {
 
   const db = admin.firestore();
   const playerData = [];
+  let rank = 1;
 
   await db
     .collection('players')
@@ -14,7 +15,8 @@ const fetchForTable = async (req, res) => {
     .get()
     .then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        playerData.push({ ...doc.data(), id: doc.id });
+        playerData.push({ ...doc.data(), id: doc.id, rank });
+        rank += 1;
       });
     })
     .catch((error) => {
