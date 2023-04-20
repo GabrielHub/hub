@@ -4,6 +4,10 @@ const navConfig = [
     path: '/hub'
   },
   {
+    title: 'Ranking',
+    path: '/hub/ranking'
+  },
+  {
     title: 'Players',
     path: '/hub/players'
   },

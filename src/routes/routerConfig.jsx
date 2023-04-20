@@ -6,6 +6,7 @@ import { GM } from './GM';
 import { UploadStats } from './UploadStats';
 import { Players, PlayerData } from './Players';
 import { ImageUpload, Success } from './ImageUpload';
+import { Ranking } from './Ranking';
 
 export const routerConfig = [
   {
@@ -28,6 +29,10 @@ export const routerConfig = [
         element: <GM />
       },
       // * 2K Stat Hub
+      {
+        path: '/hub/ranking',
+        element: <Ranking />
+      },
       {
         path: '/hub/players',
         element: <Players />
