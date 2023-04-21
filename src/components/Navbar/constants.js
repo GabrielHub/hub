@@ -1,27 +1,27 @@
 const navConfig = [
   {
-    title: 'Home',
+    title: 'HOME',
     path: '/hub'
   },
   {
-    title: 'Ranking',
+    title: 'RANKING',
     path: '/hub/ranking'
   },
   {
-    title: 'Players',
+    title: 'PLAYERS',
     path: '/hub/players'
   },
   {
-    title: 'Upload',
+    title: 'UPLOAD',
     multi: true,
     paths: [
       {
-        title: 'Upload Image',
+        title: 'UPLOAD IMAGE',
         path: '/hub/imageUpload'
       },
 
       {
-        title: 'Manual',
+        title: 'MANUAL',
         path: '/hub/manualUpload'
       }
     ]

@@ -24,15 +24,15 @@ const fetchIndividualRanking = async (req, res) => {
 
   const queryORTG = db
     .collection('players')
-    .where('ortg', '>', playerData?.ortg)
-    .orderBy('ortg', 'desc');
+    .where('offensiveRating', '>', playerData?.offensiveRating)
+    .orderBy('offensiveRating', 'desc');
 
   const offensiveRanking = await queryORTG.count().get();
 
   const queryDRTG = db
     .collection('players')
-    .where('drtg', '<', playerData?.drtg)
-    .orderBy('drtg', 'asc');
+    .where('defensiveRating', '<', playerData?.defensiveRating)
+    .orderBy('defensiveRating', 'asc');
 
   const defensiveRanking = await queryDRTG.count().get();
 
