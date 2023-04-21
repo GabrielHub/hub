@@ -402,6 +402,20 @@ export const RECENT_GAMES_COLUMNS = [
     sortable: false
   },
   {
+    field: 'PER',
+    headerName: 'PER',
+    type: 'number',
+    flex: 1,
+    sortable: false
+  },
+  {
+    field: 'aPER',
+    headerName: 'aPER',
+    type: 'number',
+    flex: 1,
+    sortable: false
+  },
+  {
     field: 'pts',
     headerName: 'PTS',
     type: 'number',
