@@ -24,7 +24,7 @@ const isValidStatline = (stat, value) => {
  * @param {*} ftPerc
  * @returns
  */
-const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) => {
+const calculateAveragePlayerStats = (leagueData, gameData, name, alias = [], ftPerc = 50) => {
   // * These are not values we want to average
   // * FT% is a constant defined by the user. We won't update this ever programmatically
   const propertiesToSkip = ['name', 'alias', 'ftPerc'];
@@ -65,8 +65,7 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
     o3PM: 0,
     oFGA: 0,
     oFGM: 0,
-    aPER: 0,
-    PER: 0
+    aPER: 0
   };
 
   // * DRtg can be NaN if the opponent took 0 fg, so skip over games where this is the case and do different division
@@ -162,6 +161,9 @@ const calculateAveragePlayerStats = (gameData, name, alias = [], ftPerc = 50) =>
   const weightOFGA = 0.556;
   const weightDRTG = 0.444;
   playerData.defensiveRanking = playerData.drtg * weightDRTG - playerData.oFGA * weightOFGA;
+
+  // * Recalculate PER here
+  playerData.PER = playerData.aPER * (leagueData.PER / leagueData.aPER);
 
   return playerData;
 };

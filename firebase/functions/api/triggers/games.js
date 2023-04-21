@@ -48,6 +48,21 @@ const upsertPlayerData = async (snapshot) => {
         _updatedAt: admin.firestore.Timestamp.now()
       });
     } else {
+      // * Get league data to recalculate PER based on league averages
+      const leagueData = await db
+        .collection('league')
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get()
+        .then((querySnapshot) => {
+          // * should only be one because of limit
+          const league = [];
+          querySnapshot.forEach((doc) => {
+            league.push(doc.data());
+          });
+          return league[0];
+        });
+
       // * collect all games by ALIAS includes NAME and use that for the calculate function
       // * There could theoretically be bad data, and an alias could be in multiple players. Avoid this by taking the first
       // TODO Error notifications/logs if there are more than one unique alias in someone's aliases?
@@ -61,7 +76,23 @@ const upsertPlayerData = async (snapshot) => {
       const gameDataRef = await db.collection('games').where('name', 'in', alias).get();
       if (gameDataRef.size >= 5) {
         const gameData = gameDataRef.docs.map((doc) => doc.data());
-        const avgPlayerStats = calculateAveragePlayerStats(gameData, storedName, alias, ftPerc);
+        const avgPlayerStats = calculateAveragePlayerStats(
+          leagueData,
+          gameData,
+          storedName,
+          alias,
+          ftPerc
+        );
+
+        // * Add number of aPER games played
+        let aPERGames = 0;
+        gameData.forEach(({ aPER }) => {
+          if (aPER) {
+            aPERGames += 1;
+          }
+        });
+
+        avgPlayerStats.aPERGamesPlayed = aPERGames;
 
         await db
           .collection('players')

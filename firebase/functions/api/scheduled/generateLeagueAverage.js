@@ -20,8 +20,7 @@ const STATS_TO_ADD = [
   'ftm',
   'pace',
   'gameScore',
-  'usageRate',
-  'aPER'
+  'usageRate'
 ];
 
 /**
@@ -82,6 +81,18 @@ const generateLeagueAverage = async () => {
 
     // * Set league average PER to 15 as per Hollinger https://www.basketball-reference.com/about/per.html
     averageGameStats.PER = 15;
+
+    // * Average aPER should be done on a per game basis (not per player) to account for minutes played
+    let sumOfAPER = 0;
+    let gamesWithAPER = 0;
+    playerList.forEach(({ aPER, aPERGamesPlayed }) => {
+      if (aPER && aPERGamesPlayed) {
+        sumOfAPER += aPER * aPERGamesPlayed;
+        gamesWithAPER += aPERGamesPlayed;
+      }
+    });
+    const aPER = sumOfAPER / gamesWithAPER;
+    averageGameStats.aPER = aPER;
 
     await db.collection('league').add({
       ...averageGameStats,
