@@ -7,9 +7,7 @@ import {
   DEFENSIVE_PLAYERS_COLUMNS,
   DEFENSIVE_PLAYERS_DEFAULT_SORTS,
   OFFENSIVE_PLAYERS_COLUMNS,
-  OFFENSIVE_PLAYERS_DEFAULT_SORTS,
-  OVERALL_PLAYERS_COLUMNS,
-  OVERALL_PLAYERS_DEFAULT_SORTS
+  OFFENSIVE_PLAYERS_DEFAULT_SORTS
 } from './constants';
 
 export function Ranking() {
@@ -26,24 +24,6 @@ export function Ranking() {
         open={defenseModalOpen}
         handleClose={() => setDefenseModalOpen(false)}
       />
-      <Grid xs={12} sx={{ paddingBottom: 2 }} container item>
-        <Grid
-          xs={12}
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ paddingBottom: 2 }}
-          container
-          item>
-          <Typography variant="h5" gutterBottom>
-            Overall Player Ranking (PER)
-          </Typography>
-        </Grid>
-        <PlayerGrid
-          columns={OVERALL_PLAYERS_COLUMNS}
-          defaultSortField={OVERALL_PLAYERS_DEFAULT_SORTS.field}
-          defaultSortType={OVERALL_PLAYERS_DEFAULT_SORTS.type}
-        />
-      </Grid>
       <Grid xs={12} sx={{ paddingBottom: 2 }} container item>
         <Grid
           xs={12}

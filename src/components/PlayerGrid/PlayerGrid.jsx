@@ -1,11 +1,29 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useSnackbar } from 'notistack';
-import { Grid } from '@mui/material';
+import { Grid, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { fetchTableData } from 'rest';
+import { TableFooterModal } from 'components/Modal';
 
 const LIMIT = 10;
+
+function Footer() {
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <Grid sx={{ p: 1 }} justifyContent="flex-end" container>
+      <TableFooterModal open={open} handleClose={handleClose} />
+      <Button sx={{ textTransform: 'none' }} onClick={() => setOpen(true)}>
+        How do I use this table?
+      </Button>
+    </Grid>
+  );
+}
 
 export function PlayerGrid(props) {
   const { columns, defaultSortField, defaultSortType } = props;
@@ -52,6 +70,9 @@ export function PlayerGrid(props) {
         loading={loading}
         autoHeight
         autoPageSize
+        slots={{
+          footer: Footer
+        }}
       />
     </Grid>
   );
