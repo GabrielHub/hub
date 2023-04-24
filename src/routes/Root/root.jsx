@@ -49,7 +49,7 @@ export function Root() {
                     Player Rankings
                   </Typography>
                   <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                    Offense{bull}Defense{bull}PER
+                    Offense{bull}Defense
                   </Typography>
                 </Grid>
                 <Grid xs={2} item>
@@ -72,6 +72,40 @@ export function Root() {
             <CardActions>
               <Button size="small" onClick={() => navigate('/hub/ranking')}>
                 View Rankings
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+        <Grid sx={{ padding: 2 }} xs={4} lg={3} item>
+          <Card sx={{ minWidth: 275, padding: 2, border: ' 4px solid #edd6ff' }} variant="outlined">
+            <CardContent>
+              <Grid alignItems="center" container>
+                <Grid xs item>
+                  <Typography variant="h5" component="div">
+                    Analysis
+                  </Typography>
+                  <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                    PER{bull}Comparisons{bull}League Avg
+                  </Typography>
+                </Grid>
+                <Grid xs={2} item>
+                  <img
+                    src={pixelLogo}
+                    alt="pixel"
+                    style={{
+                      width: 50
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Typography variant="body2">
+                View different analysis based on player/game data <br />
+                Compare players directly <br />
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button size="small" onClick={() => navigate('/hub/analysis')}>
+                View Analysis
               </Button>
             </CardActions>
           </Card>
