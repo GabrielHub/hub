@@ -16,7 +16,6 @@ import {
 } from './constants';
 
 // TODO Career Highs
-// TODO Player Comparison Table
 
 export function PlayerData() {
   const { playerID } = useParams();
