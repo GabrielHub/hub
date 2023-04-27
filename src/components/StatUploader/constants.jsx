@@ -1,3 +1,6 @@
+import { POSITION_READABLE } from 'constants';
+import { SelectPositionEditCell } from './EditCell';
+
 export const PLAYER_DATA_CONFIG = [
   {
     field: 'team',
@@ -9,6 +12,10 @@ export const PLAYER_DATA_CONFIG = [
   {
     field: 'pos',
     headerName: 'POSITION',
+    renderEditCell: SelectPositionEditCell,
+    valueGetter: (params) => {
+      return POSITION_READABLE[params.value];
+    },
     sortable: false,
     editable: true,
     flex: 1
