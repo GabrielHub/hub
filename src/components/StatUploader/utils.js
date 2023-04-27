@@ -56,8 +56,6 @@ const sumPlayerData = (players) => {
  * @returns An array of errors with error (could be the team or player name) and description of error
  */
 export const handleUploadValidation = (rawPlayerData, rawTeamData) => {
-  console.log('rawplayerdata', rawPlayerData);
-  console.log('rawTeamaata', rawTeamData);
   const errors = [];
 
   // * In case teams aren't assigned as 1 or 2, load the keys here
@@ -117,9 +115,6 @@ export const handleUploadValidation = (rawPlayerData, rawTeamData) => {
       // eslint-disable-next-line eqeqeq
       teamOnePlayerSum[stat] != rawTeamData[teamKeys[0]][stat]
     ) {
-      console.log('stat', stat);
-      console.log('teamOnePlayerSum[stat]', teamOnePlayerSum[stat]);
-      console.log('rawTeamData[teamKeys[0]][stat]', rawTeamData[teamKeys[0]][stat]);
       errors.push(addError(`Team ${teamKeys[0]}'s ${stat}`, ERROR_DESCRIPTIONS.NO_MATCHING_TOTAL));
     }
   });
@@ -131,9 +126,6 @@ export const handleUploadValidation = (rawPlayerData, rawTeamData) => {
       teamTwoPlayerSum?.[stat] &&
       teamTwoPlayerSum[stat] !== rawTeamData[teamKeys[1]][stat]
     ) {
-      console.log('stat', stat);
-      console.log('teamTwoPlayerSum[stat]', teamTwoPlayerSum[stat]);
-      console.log('rawTeamData[teamKeys[1]][stat]', rawTeamData[teamKeys[1]][stat]);
       errors.push(addError(`Team ${teamKeys[1]}'s ${stat}`, ERROR_DESCRIPTIONS.NO_MATCHING_TOTAL));
     }
   });
