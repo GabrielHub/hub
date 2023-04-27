@@ -4,6 +4,11 @@ import { Grid, TextField, IconButton } from '@mui/material';
 import DoneIcon from '@mui/icons-material/Done';
 import { TEAM_STAT_READABLE } from 'constants';
 
+/**
+ * @deprecated No longer used, use the data grid instead
+ * @param {*} props
+ * @returns
+ */
 export function TeamCard(props) {
   const { teamData, teamKey, onChange, updateValidatedTeam } = props;
 

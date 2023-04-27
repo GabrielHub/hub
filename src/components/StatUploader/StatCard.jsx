@@ -5,6 +5,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DoneIcon from '@mui/icons-material/Done';
 import { PLAYER_STAT_READABLE } from 'constants';
 
+/**
+ * @deprecated no longer used, use data grid instead
+ * @param {*} props
+ * @returns
+ */
 export function StatCard(props) {
   // * player is the key we use to edit data
   const { player, data, onChange, removePlayer, updateValidatedPlayer } = props;

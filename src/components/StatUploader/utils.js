@@ -7,7 +7,7 @@ const ERROR_DESCRIPTIONS = {
   NO_MATCHING_POSITION: ' does not have an opponent (player with same position on other team)',
   INVALID_POSITION: ' does not have a valid position (1 - 5)',
   STAT_NAN: ' stat is not a number',
-  NO_MATCHING_TOTAL: ' does not add up to their players total (stop trying to mess with the data)'
+  NO_MATCHING_TOTAL: ' does not add up to their teams total'
 };
 
 // * These are string params and should not be checked by the number validator
@@ -117,11 +117,13 @@ export const handleUploadValidation = (rawPlayerData, rawTeamData) => {
     }
   });
 
+  // * Fouls and Turnovers sometimes do not add up... not sure why this is (team turnovers or charges?)
+  const statsToSkip = ['tov', 'pf'];
   Object.keys(rawTeamData[teamKeys[1]]).forEach((stat) => {
     if (
       !playerPropsToSkip.includes(stat) &&
       // * TOV are an exception... there can be team turnovers such as 3 second calls
-      stat !== 'tov' &&
+      !statsToSkip.includes(stat) &&
       teamTwoPlayerSum?.[stat] &&
       // eslint-disable-next-line eqeqeq
       teamTwoPlayerSum[stat] != rawTeamData[teamKeys[1]][stat]

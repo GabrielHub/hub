@@ -1,115 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Grid, Button, Typography } from '@mui/material';
-import DoneIcon from '@mui/icons-material/Done';
+import { Grid, Button, Typography, Card, CardHeader, Collapse } from '@mui/material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import IconButton from '@mui/material/IconButton';
 import { useSnackbar } from 'notistack';
-import { generateRandomKey } from 'utils';
 import { uploadRawStats } from 'rest';
 import { Loading } from 'components/Loading';
-import { StatCard } from './StatCard';
-import { TeamCard } from './TeamCard';
+import { DataGrid } from '@mui/x-data-grid';
+import { sanitizeArrayData } from 'utils';
 import { handleUploadValidation } from './utils';
+import { PLAYER_DATA_CONFIG, TEAM_DATA_CONFIG } from './constants';
+
+const TABLE_KEY = {
+  TEAM: 'TEAM',
+  PLAYER: 'PLAYER'
+};
 
 export function StatUploader(props) {
   const { possiblePlayers, teamData, handleReset, uploadKey } = props;
   const { enqueueSnackbar } = useSnackbar();
-
   const [isLoading, setIsLoading] = useState(false);
+
+  // * Collapse Tables (makes it easier to copy stats down by showing/hiding tables)
+  const [collapseTeam, setCollapseTeam] = useState(true);
+  const [collapsePlayer, setCollapsePlayer] = useState(true);
 
   // * Editable list of players, this will be the list that gets uploaded
   const [playerList, setPlayerList] = useState(possiblePlayers);
 
   // * Editable list of team data
-  const [firstTeamData, setFirstTeamData] = useState(teamData[Object.keys(teamData)[0]]);
-  const [secondTeamData, setSecondTeamData] = useState(teamData[Object.keys(teamData)[1]]);
-
-  // * Manually confirm each set of stats, these keep track of what has been confirmed and hides confirmed stats
-  const [validatedTeams, setValidatedTeams] = useState([]);
-  const [validatedPlayers, setValidatedPlayers] = useState([]);
+  const [teamList, setTeamList] = useState(teamData);
 
   // * Errors from validation will have header and description (explain rules of data sanitation)
   const [errors, setErrors] = useState([]);
 
-  const updateValidatedTeam = (teamKey) => {
-    setValidatedTeams((current) => [...current, teamKey]);
-  };
-
-  const updateValidatedPlayer = (playerKey) => {
-    setValidatedPlayers((current) => [...current, playerKey]);
-  };
-
-  const updatePlayerValue = (player, valueKey, value) => {
-    setPlayerList({
-      ...playerList,
-      [player]: {
-        ...playerList[player],
-        [valueKey]: value
-      }
-    });
-  };
-
-  const updateTeamData = (teamKey, valueKey, value) => {
-    if (teamKey === 1) {
-      setFirstTeamData({
-        ...firstTeamData,
-        [valueKey]: value
-      });
-    } else if (teamKey === 2) {
-      setSecondTeamData({
-        ...secondTeamData,
-        [valueKey]: value
-      });
-    }
-  };
-
-  // * Note that player is not necessarily the name, it is the unique key we'll use to remove players here
-  const removePlayer = (player) => {
-    setPlayerList((current) => {
-      const mutablePlayerList = { ...current };
-      delete mutablePlayerList[player];
-      return mutablePlayerList;
-    });
-  };
-
-  const addPlayer = () => {
-    setPlayerList({
-      ...playerList,
-      [generateRandomKey()]: {
-        name: 'AI Player',
-        grade: 'A',
-        team: 1,
-        pos: 1,
-        pts: 0,
-        treb: 0,
-        ast: 0,
-        stl: 0,
-        blk: 0,
-        pf: 0,
-        tov: 0,
-        fgm: 0,
-        fga: 0,
-        threepm: 0,
-        threepa: 0
-      }
-    });
-  };
-
   const handleStatUpload = async () => {
     setIsLoading(true);
     setErrors([]);
-    const rawPlayerData = Object.keys(playerList).map((playerKey) => playerList[playerKey]);
-    const rawTeamData = {
-      [firstTeamData.team]: firstTeamData,
-      [secondTeamData.team]: secondTeamData
-    };
+    const rawPlayerData = sanitizeArrayData(playerList);
+    const rawTeamData = {};
+    sanitizeArrayData(teamList).forEach((totalData) => {
+      rawTeamData[totalData.team] = totalData;
+    });
 
     const validation = handleUploadValidation(rawPlayerData, rawTeamData);
     // * If we have errors stop everything and display rules and errors
     if (!_.isEmpty(validation)) {
       setErrors(validation);
-      setValidatedPlayers([]);
-      setValidatedTeams([]);
       setIsLoading(false);
       return;
     }
@@ -125,48 +64,41 @@ export function StatUploader(props) {
     }
   };
 
+  const processRowUpdate = useCallback(
+    async (updatedRow, tableKey) => {
+      if (tableKey === TABLE_KEY.TEAM) {
+        setTeamList((current) => {
+          const mutableTeamList = [...current];
+          const indexOfSelectedRow = mutableTeamList.findIndex(({ id }) => id === updatedRow.id);
+          mutableTeamList[indexOfSelectedRow] = updatedRow;
+          return mutableTeamList;
+        });
+      } else {
+        setPlayerList((current) => {
+          const mutablePlayerList = [...current];
+          const indexOfSelectedRow = mutablePlayerList.findIndex(({ id }) => id === updatedRow.id);
+          mutablePlayerList[indexOfSelectedRow] = updatedRow;
+          return mutablePlayerList;
+        });
+      }
+      enqueueSnackbar('Validated row', { variant: 'success' });
+      return updatedRow;
+    },
+    [enqueueSnackbar]
+  );
+
+  const handleProcessRowUpdateError = useCallback(
+    (error) => {
+      enqueueSnackbar(error.message, { variant: 'error' });
+    },
+    [enqueueSnackbar]
+  );
+
   return (
     <Grid xs={12} justifyContent="center" alignItems="center" container item>
       <Loading isLoading={isLoading} />
 
-      <Grid xs={12} justifyContent="center" alignItems="center" container item>
-        <Typography variant="h5" align="center" gutterBottom>
-          <b>TEAM STATS</b>
-        </Typography>
-        {Boolean(validatedTeams.length) &&
-          validatedTeams.map((teamKey) => <DoneIcon key={teamKey} color="success" size="small" />)}
-      </Grid>
-      {!validatedTeams.includes(1) && (
-        <TeamCard
-          teamData={firstTeamData}
-          teamKey={1}
-          onChange={updateTeamData}
-          updateValidatedTeam={updateValidatedTeam}
-        />
-      )}
-      {!validatedTeams.includes(2) && (
-        <TeamCard
-          teamData={secondTeamData}
-          teamKey={2}
-          onChange={updateTeamData}
-          updateValidatedTeam={updateValidatedTeam}
-        />
-      )}
-      <Grid xs={12} justifyContent="center" alignItems="center" container item>
-        <Grid xs={12} justifyContent="center" alignItems="center" container item>
-          <Typography variant="h5" style={{ display: 'flex', alignItems: 'center' }}>
-            <b>PLAYER STATS</b>{' '}
-            <Button color="primary" variant="contained" onClick={addPlayer} sx={{ margin: 1 }}>
-              Add Extra Player
-            </Button>
-          </Typography>
-        </Grid>
-        <Grid xs={12} justifyContent="center" alignItems="center" container item>
-          <Typography align="center" variant="caption" sx={{ color: 'grey' }} gutterBottom>
-            You do not need to add the players with the done button. The button is just there to
-            make it easier to update stats by hiding players.
-          </Typography>
-        </Grid>
+      <Grid xs={12} item>
         {Boolean(errors.length) &&
           errors.map(({ error, description }, index) => (
             <Grid key={error} xs={4} item>
@@ -176,35 +108,79 @@ export function StatUploader(props) {
             </Grid>
           ))}
       </Grid>
-      {Boolean(Object.keys(playerList).length) &&
-        Object.keys(playerList).map((player) => {
-          if (!validatedPlayers.includes(player)) {
-            return (
-              <StatCard
-                key={player}
-                player={player}
-                data={playerList[player]}
-                onChange={updatePlayerValue}
-                removePlayer={removePlayer}
-                updateValidatedPlayer={updateValidatedPlayer}
-              />
-            );
-          }
-          return (
-            <Grid key={player} alignItems="center" container xs item>
-              <Typography sx={{ padding: 1 }}>
-                {playerList[player].name}{' '}
-                <DoneIcon sx={{ padding: 1 }} color="success" size="small" />
-              </Typography>
-            </Grid>
-          );
-        })}
+
+      <Grid xs={12} sx={{ marginBottom: 2, px: 12 }} item>
+        <Card sx={{ padding: 2 }}>
+          <CardHeader
+            title="TEAM TOTALS"
+            action={
+              <IconButton
+                onClick={() => setCollapseTeam(!collapseTeam)}
+                aria-label="expand"
+                size="small">
+                {collapseTeam ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            }
+          />
+          <Collapse in={collapseTeam} timeout="auto" unmountOnExit>
+            <DataGrid
+              rows={teamList}
+              columns={TEAM_DATA_CONFIG}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 1
+                  }
+                }
+              }}
+              processRowUpdate={(updatedRow) => processRowUpdate(updatedRow, TABLE_KEY.TEAM)}
+              onProcessRowUpdateError={handleProcessRowUpdateError}
+              autoHeight
+              pageSizeOptions={[1]}
+              editMode="row"
+              disableRowSelectionOnClick
+            />
+          </Collapse>
+        </Card>
+      </Grid>
+
+      <Grid xs={12} sx={{ marginBottom: 2, px: 12 }} item>
+        <Card sx={{ padding: 2 }}>
+          <CardHeader
+            title="PLAYER STATS"
+            action={
+              <IconButton
+                onClick={() => setCollapsePlayer(!collapsePlayer)}
+                aria-label="expand"
+                size="small">
+                {collapsePlayer ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            }
+          />
+          <Collapse in={collapsePlayer} timeout="auto" unmountOnExit>
+            <DataGrid
+              rows={playerList}
+              columns={PLAYER_DATA_CONFIG}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 5
+                  }
+                }
+              }}
+              processRowUpdate={(updatedRow) => processRowUpdate(updatedRow, TABLE_KEY.TEAM)}
+              onProcessRowUpdateError={handleProcessRowUpdateError}
+              autoHeight
+              pageSizeOptions={[5]}
+              editMode="row"
+              disableRowSelectionOnClick
+            />
+          </Collapse>
+        </Card>
+      </Grid>
+
       <Grid xs={12} justifyContent="center" container item>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={handleStatUpload}
-          disabled={Object.keys(playerList).length !== 10}>
+        <Button color="primary" variant="contained" onClick={handleStatUpload}>
           UPLOAD STATS
         </Button>
       </Grid>
@@ -213,12 +189,8 @@ export function StatUploader(props) {
 }
 
 StatUploader.propTypes = {
-  possiblePlayers: PropTypes.objectOf(
-    PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number]))
-  ).isRequired,
-  teamData: PropTypes.objectOf(
-    PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number]))
-  ).isRequired,
+  possiblePlayers: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
+  teamData: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)).isRequired,
   handleReset: PropTypes.func.isRequired,
   uploadKey: PropTypes.string
 };

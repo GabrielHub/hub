@@ -1,128 +1,97 @@
-/**
- * @description Given a large sample of text, try and find all possible players and assign estimated stats (will likely be inaccurate due to OCR inconsistency)
- * @param {string[]} input array of strings (words from large text)
- * @returns object of possible player names and the stats that follow them
- */
-export const parsePossiblePlayerData = (input) => {
-  const result = {};
+import { v4 as uuidv4 } from 'uuid';
 
-  // * hardcode remove some common matching mistakes
-  const commonErrors = ['3PM/3PA', 'FGM/FGA', 'MATCHUP'];
+function parseStats(str, team, position = 0) {
+  const [tpmtpa, fgmtpa, tov, pf, blk, stl, ast, treb, pts, grade, ...nameArr] = str
+    .split(' ')
+    .reverse();
+  const [fgm, fga] = fgmtpa.split('/');
+  const [threepm, threepa] = tpmtpa.split('/');
+  const name = nameArr.reverse().join(' ');
 
-  // * Assume that player names will likely be longer than 5 letters
-  input.forEach((word, index) => {
-    if (word.length > 5 && !commonErrors.includes(word)) {
-      // * get the next 10 words (stats) after finding a possible name
-      const [grd, pts, treb, ast, stl, blk, pf, tov, fg, threep] = input.slice(
-        index + 1,
-        index + 11
-      );
+  // * Generate uuid for data grid (and for future use to store reference IDs, opponent, game, team data etc.)
+  const id = uuidv4();
 
-      const [fgm = 0, fga = 0] = fg ? fg.split('/') : [0, 0];
-      const [threepm = 0, threepa = 0] = threep ? threep.split('/') : [0, 0];
+  const stats = {
+    // * Add position if it exists( if we're adding a player not a team )
+    ...(Boolean(position) && { pos: position }),
+    id,
+    team,
+    name,
+    grade,
+    pts,
+    treb,
+    ast,
+    stl,
+    blk,
+    pf,
+    tov,
+    fgm,
+    fga,
+    threepm,
+    threepa
+  };
 
-      // * We'll automatically calculate % and FTM/FTA and advanced stats based on the following inputs
-      result[word] = {
-        name: word,
-        grd,
-        team: 1,
-        // TODO Map 1 - 5 to readable PG - C
-        pos: 1, // * POS Defined by 1 - 5
-        pts,
-        treb,
-        ast,
-        stl,
-        blk,
-        pf,
-        tov,
-        fgm,
-        fga,
-        threepm,
-        threepa
+  return stats;
+}
+
+export const parseGameData = (lines) => {
+  // console.log('LINES!', lines);
+  const teams = [];
+  let currentTeam = {};
+  lines.forEach((line) => {
+    // * Identifier for team
+    const team = teams.length + 1;
+
+    if (line.startsWith('Team')) {
+      currentTeam = {
+        name: `Team ${team}`,
+        team,
+        players: []
       };
+    } else if (line.startsWith('TOTAL')) {
+      currentTeam.total = parseStats(line, team);
+      teams.push(currentTeam);
+      currentTeam = {};
+    } else {
+      // * Assign position by order
+      const position = currentTeam.players.length + 1;
+      currentTeam.players.push(parseStats(line, team, position));
     }
   });
 
-  return result;
-};
-
-/**
- * @description Find every instance of TOTAL (every team stat) and return team data
- * @param {string[]} input Array of strings
- * @returns
- */
-export const parseTeamTotalData = (input) => {
-  const result = {};
-  const keyword = 'TOTAL';
-
-  input.forEach((word, index) => {
-    if (word === keyword) {
-      // * get the next 10 words (stats) after finding a possible team
-      const [grd, pts, reb, ast, stl, blk, pf, tov, fg, threep] = input.slice(
-        index + 1,
-        index + 11
-      );
-
-      const [fgm = 0, fga = 0] = fg.split('/');
-      const [threepm = 0, threepa = 0] = threep.split('/');
-
-      // * We'll automatically calculate % and FTM/FTA and advanced stats in the backend based on the following inputs
-      result[Object.keys(result).length + 1] = {
-        team: Object.keys(result).length + 1,
-        grd,
-        pts,
-        reb,
-        ast,
-        stl,
-        blk,
-        pf,
-        tov,
-        fgm,
-        fga,
-        threepm,
-        threepa
-      };
+  // * Add 5th player, since 5th player will always be missing
+  teams.forEach((team, index) => {
+    if (team.players.length < 5) {
+      teams[index].players.push({
+        id: uuidv4(),
+        pos: 5,
+        team: index + 1,
+        name: 'AI Player',
+        grade: 0,
+        pts: 0,
+        treb: 0,
+        ast: 0,
+        stl: 0,
+        blk: 0,
+        pf: 0,
+        tov: 0,
+        fgm: 0,
+        fga: 0,
+        threepm: 0,
+        threepa: 0
+      });
     }
   });
 
-  // * Handle errors (if OCR couldn't read any totals)
-  const totalTeams = Object.keys(result).length;
-  if (!totalTeams) {
-    result[1] = {
-      team: 1,
-      grd: 0,
-      pts: 0,
-      reb: 0,
-      ast: 0,
-      stl: 0,
-      blk: 0,
-      pf: 0,
-      tov: 0,
-      fgm: 0,
-      fga: 0,
-      threepm: 0,
-      threepa: 0
-    };
-  }
-  if (totalTeams < 2) {
-    result[2] = {
-      team: 2,
-      grd: 0,
-      pts: 0,
-      reb: 0,
-      ast: 0,
-      stl: 0,
-      blk: 0,
-      pf: 0,
-      tov: 0,
-      fgm: 0,
-      fga: 0,
-      threepm: 0,
-      threepa: 0
-    };
-  }
+  // * Keep data above in case we change the way we store the data, but reorganize it into table row data here
+  const teamTotals = [];
+  let playerTotals = [];
+  teams.forEach((team) => {
+    teamTotals.push(team.total);
+    playerTotals = playerTotals.concat(team.players);
+  });
 
-  return result;
+  return { teamTotals, playerTotals };
 };
 
 /**
