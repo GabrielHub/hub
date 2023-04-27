@@ -27,6 +27,34 @@ What can you do with it?
 2. Compare and rank players by statistic
 3. WIP - Compare to NBA players (using PER)
 4. WIP - Direct comparisons to other players with advanced analysis
+
+### TODOS:
+
+> Add NBA Comparison Analytics Tool
+- Add a new tab to the analytics page to allow selecting a player (algolia) and finding the 3 most similar nba players
+> Add Player Comparison Tool
+- Maybe link from player page? Or another tab on the analytics page
+- Add advanced analytics API
+    - returns who is a better shooter and why
+    - returns who is a better defender and why
+> Career Highs (league + player)
+- Add `career` subcollection to `players`
+- League average scheduled function should also calculate league highs in stats based on player `career` subcollection
+> Refactor for new seasons (years)
+- When resetting games (resetting for a new 2K or for other reasons)
+    - Refactor PER to use PER estimation equation instead of league averages for when we don't have league averages
+    - createdAt and updatedAt should be done through triggers so we can date `players` and `games`
+- Separate games by position and add averages per position
+> These will allow for recalculating stats if equations change
+- Store game totals in a new collection
+- Store references for `games` documents
+    - reference game totals
+    - reference opponent data
+> Improve maintainability
+- Add consistent error handling for API calls on the frontend
+- Add Express error handling for REST APIs on the backend
+- Add Unit Tests on the backend (especially for calculation functions)
+
 ---
 
 ## How to deploy
