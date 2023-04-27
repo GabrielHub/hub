@@ -22,7 +22,7 @@ export const PLAYER_DATA_CONFIG = [
     description: 'Name is often incorrect, please double check that there are no typos in the name'
   },
   {
-    field: 'grade',
+    field: 'grd',
     headerName: 'GRD',
     sortable: false,
     editable: true,
@@ -117,7 +117,7 @@ export const TEAM_DATA_CONFIG = [
     flex: 1
   },
   {
-    field: 'grade',
+    field: 'grd',
     headerName: 'GRD',
     sortable: false,
     editable: true,

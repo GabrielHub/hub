@@ -11,7 +11,7 @@ const ERROR_DESCRIPTIONS = {
 };
 
 // * These are string params and should not be checked by the number validator
-const playerPropsToSkip = ['name', 'grd', 'team'];
+const playerPropsToSkip = ['name', 'grd', 'team', 'id'];
 
 const addError = (error, description) => {
   return { error, description };
@@ -56,6 +56,8 @@ const sumPlayerData = (players) => {
  * @returns An array of errors with error (could be the team or player name) and description of error
  */
 export const handleUploadValidation = (rawPlayerData, rawTeamData) => {
+  console.log('rawplayerdata', rawPlayerData);
+  console.log('rawTeamaata', rawTeamData);
   const errors = [];
 
   // * In case teams aren't assigned as 1 or 2, load the keys here
@@ -104,30 +106,34 @@ export const handleUploadValidation = (rawPlayerData, rawTeamData) => {
   const teamOnePlayerSum = sumPlayerData(playersOnTeamOne);
   const teamTwoPlayerSum = sumPlayerData(playersOnTeamTwo);
 
+  // * Fouls and Turnovers sometimes do not add up... not sure why this is (team turnovers or charges?)
+  const statsToSkip = ['tov', 'pf'];
+
   Object.keys(rawTeamData[teamKeys[0]]).forEach((stat) => {
     if (
       !playerPropsToSkip.includes(stat) &&
-      // * TOV are an exception... there can be team turnovers such as 3 second calls
-      stat !== 'tov' &&
+      !statsToSkip.includes(stat) &&
       teamOnePlayerSum?.[stat] &&
       // eslint-disable-next-line eqeqeq
       teamOnePlayerSum[stat] != rawTeamData[teamKeys[0]][stat]
     ) {
+      console.log('stat', stat);
+      console.log('teamOnePlayerSum[stat]', teamOnePlayerSum[stat]);
+      console.log('rawTeamData[teamKeys[0]][stat]', rawTeamData[teamKeys[0]][stat]);
       errors.push(addError(`Team ${teamKeys[0]}'s ${stat}`, ERROR_DESCRIPTIONS.NO_MATCHING_TOTAL));
     }
   });
 
-  // * Fouls and Turnovers sometimes do not add up... not sure why this is (team turnovers or charges?)
-  const statsToSkip = ['tov', 'pf'];
   Object.keys(rawTeamData[teamKeys[1]]).forEach((stat) => {
     if (
       !playerPropsToSkip.includes(stat) &&
-      // * TOV are an exception... there can be team turnovers such as 3 second calls
       !statsToSkip.includes(stat) &&
       teamTwoPlayerSum?.[stat] &&
-      // eslint-disable-next-line eqeqeq
-      teamTwoPlayerSum[stat] != rawTeamData[teamKeys[1]][stat]
+      teamTwoPlayerSum[stat] !== rawTeamData[teamKeys[1]][stat]
     ) {
+      console.log('stat', stat);
+      console.log('teamTwoPlayerSum[stat]', teamTwoPlayerSum[stat]);
+      console.log('rawTeamData[teamKeys[1]][stat]', rawTeamData[teamKeys[1]][stat]);
       errors.push(addError(`Team ${teamKeys[1]}'s ${stat}`, ERROR_DESCRIPTIONS.NO_MATCHING_TOTAL));
     }
   });

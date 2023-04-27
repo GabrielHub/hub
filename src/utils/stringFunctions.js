@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 function parseStats(str, team, position = 0) {
-  const [tpmtpa, fgmtpa, tov, pf, blk, stl, ast, treb, pts, grade, ...nameArr] = str
+  const [tpmtpa, fgmtpa, tov, pf, blk, stl, ast, treb, pts, grd, ...nameArr] = str
     .split(' ')
     .reverse();
   const [fgm, fga] = fgmtpa.split('/');
@@ -17,7 +17,7 @@ function parseStats(str, team, position = 0) {
     id,
     team,
     name,
-    grade,
+    grd,
     pts,
     treb,
     ast,
@@ -67,7 +67,7 @@ export const parseGameData = (lines) => {
         pos: 5,
         team: index + 1,
         name: 'AI Player',
-        grade: 0,
+        grd: 'A',
         pts: 0,
         treb: 0,
         ast: 0,

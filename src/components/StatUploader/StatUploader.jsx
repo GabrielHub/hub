@@ -1,15 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Grid, Button, Typography, Card, CardHeader, Collapse } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import IconButton from '@mui/material/IconButton';
+import { Grid, Button, Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { uploadRawStats } from 'rest';
 import { Loading } from 'components/Loading';
 import { DataGrid } from '@mui/x-data-grid';
 import { sanitizeArrayData } from 'utils';
+import { CollapsibleCard } from 'components/CollapsibleCard';
 import { handleUploadValidation } from './utils';
 import { PLAYER_DATA_CONFIG, TEAM_DATA_CONFIG } from './constants';
 
@@ -22,10 +20,6 @@ export function StatUploader(props) {
   const { possiblePlayers, teamData, handleReset, uploadKey } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
-
-  // * Collapse Tables (makes it easier to copy stats down by showing/hiding tables)
-  const [collapseTeam, setCollapseTeam] = useState(true);
-  const [collapsePlayer, setCollapsePlayer] = useState(true);
 
   // * Editable list of players, this will be the list that gets uploaded
   const [playerList, setPlayerList] = useState(possiblePlayers);
@@ -97,86 +91,62 @@ export function StatUploader(props) {
   return (
     <Grid xs={12} justifyContent="center" alignItems="center" container item>
       <Loading isLoading={isLoading} />
+      {Boolean(errors.length) && (
+        <Grid xs={12} sx={{ marginBottom: 2, px: 12 }} item>
+          <CollapsibleCard title="VALIDATION ERRORS">
+            {errors.map(({ error, description }, index) => (
+              <Grid key={error} xs={4} item>
+                <Typography align="center" color="error" variant="body1" gutterBottom>
+                  {index + 1}. <b>{error}:</b> {description}
+                </Typography>
+              </Grid>
+            ))}
+          </CollapsibleCard>
+        </Grid>
+      )}
 
-      <Grid xs={12} item>
-        {Boolean(errors.length) &&
-          errors.map(({ error, description }, index) => (
-            <Grid key={error} xs={4} item>
-              <Typography align="center" color="error" variant="body1" gutterBottom>
-                {index + 1}. <b>{error}:</b> {description}
-              </Typography>
-            </Grid>
-          ))}
+      <Grid xs={12} sx={{ marginBottom: 2, px: 12 }} item>
+        <CollapsibleCard title="TEAM TOTALS">
+          <DataGrid
+            rows={teamList}
+            columns={TEAM_DATA_CONFIG}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 1
+                }
+              }
+            }}
+            processRowUpdate={(updatedRow) => processRowUpdate(updatedRow, TABLE_KEY.TEAM)}
+            onProcessRowUpdateError={handleProcessRowUpdateError}
+            autoHeight
+            pageSizeOptions={[1]}
+            editMode="row"
+            disableRowSelectionOnClick
+          />
+        </CollapsibleCard>
       </Grid>
 
       <Grid xs={12} sx={{ marginBottom: 2, px: 12 }} item>
-        <Card sx={{ padding: 2 }}>
-          <CardHeader
-            title="TEAM TOTALS"
-            action={
-              <IconButton
-                onClick={() => setCollapseTeam(!collapseTeam)}
-                aria-label="expand"
-                size="small">
-                {collapseTeam ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-              </IconButton>
-            }
-          />
-          <Collapse in={collapseTeam} timeout="auto" unmountOnExit>
-            <DataGrid
-              rows={teamList}
-              columns={TEAM_DATA_CONFIG}
-              initialState={{
-                pagination: {
-                  paginationModel: {
-                    pageSize: 1
-                  }
+        <CollapsibleCard title="PLAYER STATS">
+          <DataGrid
+            rows={playerList}
+            columns={PLAYER_DATA_CONFIG}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5
                 }
-              }}
-              processRowUpdate={(updatedRow) => processRowUpdate(updatedRow, TABLE_KEY.TEAM)}
-              onProcessRowUpdateError={handleProcessRowUpdateError}
-              autoHeight
-              pageSizeOptions={[1]}
-              editMode="row"
-              disableRowSelectionOnClick
-            />
-          </Collapse>
-        </Card>
-      </Grid>
-
-      <Grid xs={12} sx={{ marginBottom: 2, px: 12 }} item>
-        <Card sx={{ padding: 2 }}>
-          <CardHeader
-            title="PLAYER STATS"
-            action={
-              <IconButton
-                onClick={() => setCollapsePlayer(!collapsePlayer)}
-                aria-label="expand"
-                size="small">
-                {collapsePlayer ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-              </IconButton>
-            }
+              }
+            }}
+            processRowUpdate={(updatedRow) => processRowUpdate(updatedRow, TABLE_KEY.PLAYER)}
+            onProcessRowUpdateError={handleProcessRowUpdateError}
+            autoHeight
+            pageSizeOptions={[5]}
+            editMode="row"
+            disableRowSelectionOnClick
           />
-          <Collapse in={collapsePlayer} timeout="auto" unmountOnExit>
-            <DataGrid
-              rows={playerList}
-              columns={PLAYER_DATA_CONFIG}
-              initialState={{
-                pagination: {
-                  paginationModel: {
-                    pageSize: 5
-                  }
-                }
-              }}
-              processRowUpdate={(updatedRow) => processRowUpdate(updatedRow, TABLE_KEY.TEAM)}
-              onProcessRowUpdateError={handleProcessRowUpdateError}
-              autoHeight
-              pageSizeOptions={[5]}
-              editMode="row"
-              disableRowSelectionOnClick
-            />
-          </Collapse>
-        </Card>
+        </CollapsibleCard>
       </Grid>
 
       <Grid xs={12} justifyContent="center" container item>
