@@ -4,10 +4,13 @@ import 'react-image-crop/dist/ReactCrop.css';
 import _ from 'lodash';
 import { Grid, Button, Typography, TextField, Switch } from '@mui/material';
 import Tesseract from 'tesseract.js';
+import Upscaler from 'upscaler';
 import { parseGameData } from 'utils';
 import { StatUploader } from 'components/StatUploader';
 import { Loading } from 'components/Loading';
 import { canvasPreview } from './utils';
+
+const upscaler = new Upscaler();
 
 export function UploadStats() {
   // * Data state
@@ -19,7 +22,7 @@ export function UploadStats() {
   const [confidence, setConfidence] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hideRules, setHideRules] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(null);
   const [uploadKey, setUploadKey] = useState('');
 
   // * Crop state
@@ -41,10 +44,10 @@ export function UploadStats() {
 
     Tesseract.recognize(dataUrl, 'eng', {
       logger: (m) => {
-        setProgress(Math.floor(m.progress * 100));
+        setProgress(`${(m.progress * 100).toFixed(2)}%`);
       }
     }).then(({ data: { lines, confidence: confidenceResult } }) => {
-      setProgress(0);
+      setProgress(null);
       setConfidence(confidenceResult);
       const formattedLines = lines.map(({ text }) => {
         return text.slice(0, text.length - 1);
@@ -60,7 +63,7 @@ export function UploadStats() {
     });
   }, []);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     if (e.target.files && e.target.files.length > 0) {
       setCrop(undefined); // * Makes crop preview update between images.
       const reader = new FileReader();
@@ -69,10 +72,34 @@ export function UploadStats() {
     }
   };
 
+  const upscaleImage = () => {
+    // * Start loading before we upscale image
+    setIsLoading(true);
+
+    // ? Progress is bugged, I think it's an issue with the package
+    const upscaledImage = new Image();
+    upscaledImage.crossOrigin = 'anonymous'; // * Sets cors
+    upscaledImage.src = imageData;
+    upscaledImage.onload = () => {
+      upscaler
+        .upscale(upscaledImage, {
+          patchSize: 8,
+          padding: 2,
+          progress: (percent) => {
+            setProgress(`Upscaling Image: ${percent * 100}%`);
+          }
+        })
+        .then(setImageData);
+    };
+
+    // * Stop loading after upscaling
+    setIsLoading(false);
+  };
+
   const handleReset = () => {
     setImageData(null);
     setConfidence(null);
-    setProgress(0);
+    setProgress(null);
     setTeamData([]);
     setPlayerData([]);
     setCrop(null);
@@ -110,7 +137,7 @@ export function UploadStats() {
 
   return (
     <>
-      <Loading isLoading={isLoading} />
+      <Loading isLoading={isLoading} progress={progress} />
       <Grid container>
         <Grid xs={12} item>
           <Typography align="center" variant="h4" gutterBottom>
@@ -161,7 +188,7 @@ export function UploadStats() {
         )}
 
         <Grid xs={12} justifyContent="center" alignItems="center" container item>
-          <Grid xs={12} lg={6} justifyContent="center" alignItems="center" container item>
+          <Grid xs={12} xl={6} justifyContent="center" alignItems="center" container item>
             <Grid xs justifyContent="center" container item>
               <TextField
                 placeholder="Upload key"
@@ -193,6 +220,9 @@ export function UploadStats() {
         {Boolean(imageData) && (
           <Grid xs={12} justifyContent="center" alignItems="flex-end" container item>
             <Grid xs={12} sm={6} sx={{ padding: 2 }} item>
+              <Button sx={{ margin: 'auto' }} onClick={upscaleImage}>
+                Upscale Image
+              </Button>
               <ReactCrop
                 crop={crop}
                 onChange={(cr, percentCrop) => setCrop(percentCrop)}
@@ -211,7 +241,6 @@ export function UploadStats() {
               <Grid xs={12} sm={6} sx={{ padding: 2 }} container item>
                 <Grid xs={12} justifyContent="center" item>
                   <Grid xs={12} item>
-                    {Boolean(progress) && <Typography>Recognizing Image: {progress}%</Typography>}
                     {Boolean(confidence) && (
                       <Typography gutterBottom>
                         <b>Confidence:</b> {confidence}%
