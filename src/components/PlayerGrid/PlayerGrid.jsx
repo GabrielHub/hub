@@ -2,11 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useSnackbar } from 'notistack';
 import { Grid, Button } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridPagination } from '@mui/x-data-grid';
 import { fetchTableData } from 'rest';
 import { TableFooterModal } from 'components/Modal';
 
-const LIMIT = 10;
+// * There are not enough players to put a hard limit.
+const LIMIT = 100;
 
 function Footer() {
   const [open, setOpen] = useState(false);
@@ -21,6 +22,7 @@ function Footer() {
       <Button sx={{ textTransform: 'none' }} onClick={() => setOpen(true)}>
         How do I use this table?
       </Button>
+      <GridPagination />
     </Grid>
   );
 }
@@ -59,16 +61,13 @@ export function PlayerGrid(props) {
   }, [getTableRows]);
 
   return (
-    <Grid xs={12} item>
+    <Grid xs={12} sx={{ height: 650 }} item>
       <DataGrid
         rows={rows}
         columns={columns}
         sortingMode="server"
-        paginationMode="server"
-        rowCount={LIMIT}
         onSortModelChange={(newSortModel) => setSortModel(newSortModel)}
         loading={loading}
-        autoHeight
         autoPageSize
         slots={{
           footer: Footer

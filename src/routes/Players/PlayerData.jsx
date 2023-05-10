@@ -243,7 +243,7 @@ export function PlayerData() {
           {/* Last 5 games */}
           <Grid xs={12} item>
             <Typography align="center" variant="h5" gutterBottom>
-              Last 5 Games Played
+              Games Played (Last 100)
             </Typography>
           </Grid>
           <GameGrid playerID={playerID} columns={RECENT_GAMES_COLUMNS} />

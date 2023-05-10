@@ -5,8 +5,8 @@ import { Grid } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { fetchLastGames } from 'rest';
 
-// * Hard code for now, not sure if I want to allow them to keep fetching more
-const NUMBER_OF_GAMES = 5;
+// * There are not enough games to put a hard limit.
+const NUMBER_OF_GAMES = 100;
 
 export function GameGrid(props) {
   const { columns, playerID } = props;
@@ -35,16 +35,8 @@ export function GameGrid(props) {
   }, [getTableRows]);
 
   return (
-    <Grid xs={12} item>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        paginationMode="server"
-        rowCount={NUMBER_OF_GAMES}
-        loading={loading}
-        autoHeight
-        autoPageSize
-      />
+    <Grid xs={12} sx={{ height: 375 }} item>
+      <DataGrid rows={rows} columns={columns} loading={loading} autoPageSize />
     </Grid>
   );
 }
