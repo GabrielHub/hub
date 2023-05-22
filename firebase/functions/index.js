@@ -14,6 +14,7 @@ const updatePlayerDetails = require('./api/updatePlayerDetails');
 const fetchIndividualRanking = require('./api/ranking');
 const fetchLastGames = require('./api/fetchLastGames');
 const fetchLeagueAverages = require('./api/fetchLeagueAverages');
+const compareToNBA = require('./api/compareToNBA');
 
 // * Cloud triggers
 const upsertPlayerData = require('./api/triggers/games');
@@ -52,6 +53,7 @@ app.post('/updatePlayerDetails', cors(corsOptionsDelegate), updatePlayerDetails)
 app.get('/ranking', cors(corsOptionsDelegate), fetchIndividualRanking);
 app.get('/fetchLastGames', cors(corsOptionsDelegate), fetchLastGames);
 app.get('/league', cors(corsOptionsDelegate), fetchLeagueAverages);
+app.get('/similarity', cors(corsOptionsDelegate), compareToNBA);
 
 // * webhook
 app.post('/nanonets/webhook', cors(corsOptionsDelegate), NanonetsWebhook);

@@ -54,6 +54,7 @@ What can you do with it?
 - Add consistent error handling for API calls on the frontend
 - Add Express error handling for REST APIs on the backend
 - Add Unit Tests on the backend (especially for calculation functions)
+- ? Convert backend to Typescript?
 
 ---
 
