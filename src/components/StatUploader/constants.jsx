@@ -1,4 +1,3 @@
-import { POSITION_READABLE } from 'constants';
 import { SelectPositionEditCell } from './EditCell';
 
 export const PLAYER_DATA_CONFIG = [
@@ -14,7 +13,7 @@ export const PLAYER_DATA_CONFIG = [
     headerName: 'POSITION',
     renderEditCell: SelectPositionEditCell,
     valueGetter: (params) => {
-      return POSITION_READABLE[params.value];
+      return params.value;
     },
     sortable: false,
     editable: true,

@@ -30,7 +30,7 @@ export function StatUploader(props) {
   // * Errors from validation will have header and description (explain rules of data sanitation)
   const [errors, setErrors] = useState([]);
 
-  const handleStatUpload = async () => {
+  const handleStatUpload = useCallback(async () => {
     setIsLoading(true);
     setErrors([]);
     const rawPlayerData = sanitizeArrayData(playerList);
@@ -56,7 +56,7 @@ export function StatUploader(props) {
       setIsLoading(false);
       handleReset();
     }
-  };
+  }, [enqueueSnackbar, handleReset, playerList, teamList, uploadKey]);
 
   const processRowUpdate = useCallback(
     async (updatedRow, tableKey) => {
