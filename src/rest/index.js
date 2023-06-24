@@ -4,3 +4,4 @@ export * from './fetchPopularity';
 export * from './uploadRawStats';
 export * from './firestore';
 export * from './uploadNanonet';
+export * from './fetchSimilarPlayers';
