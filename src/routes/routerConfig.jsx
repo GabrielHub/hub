@@ -8,6 +8,7 @@ import { Players, PlayerData } from './Players';
 import { ImageUpload, Success } from './ImageUpload';
 import { Ranking } from './Ranking';
 import { Analysis } from './Analysis';
+import { Maps } from './Maps';
 
 export const routerConfig = [
   {
@@ -57,6 +58,10 @@ export const routerConfig = [
       {
         path: '/hub/manualUpload',
         element: <UploadStats />
+      },
+      {
+        path: '/hub/maps',
+        element: <Maps />
       }
     ]
   }
